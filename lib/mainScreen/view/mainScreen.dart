@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/component/custom_elevatedButton.dart';
 import 'package:flutter_tour_list/common/component/custom_text_field.dart';
@@ -19,7 +22,8 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _getCoordinates() async {
     // if (address.isEmpty) return;
-
+    String jsonString = await rootBundle.loadString('assets/json/dataList.json');
+    print(json.decode(jsonString));
 
     // try {
     //   final result = await _geocodingService.fetchCoordinates(address);
