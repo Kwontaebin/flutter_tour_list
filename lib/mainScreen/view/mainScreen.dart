@@ -1,10 +1,9 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/component/custom_elevatedButton.dart';
 import 'package:flutter_tour_list/common/component/custom_text_field.dart';
+import '../../common/const/data.dart';
 import '../component/geoCoding.dart';
 
 class MainScreen extends StatefulWidget {
@@ -17,26 +16,44 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final NaverGeocodingService _geocodingService = NaverGeocodingService();
   late var address = "";
+  List dataList = [];
   String? _latitude;
   String? _longitude;
 
   Future<void> _getCoordinates() async {
-    // if (address.isEmpty) return;
-    String jsonString = await rootBundle.loadString('assets/json/dataList.json');
-    print(json.decode(jsonString));
+    var dio = Dio();
 
-    // try {
-    //   final result = await _geocodingService.fetchCoordinates(address);
-    //   setState(() {
-    //     _latitude = result['latitude'].toString();
-    //     _longitude = result['longitude'].toString();
-    //
-    //     print(_latitude);
-    //     print(_longitude);
-    //   });
-    // } catch (e) {
-    //   print('Error: ${e.toString()}');
-    // }
+    String url = API_URL;
+
+    Map<String, dynamic> queryParameters = {
+      'serviceKey': API_SERVICES_KEY,
+      'pageNo': 1,
+      'numOfRows': 5,
+      'MobileOS': 'IOS',
+      'MobileApp': '서울 여행',
+      'baseYm': '202411',
+      'areaCd': 11,
+      'signguCd': 11110,
+      '_type': 'JSON',
+    };
+
+    try {
+      Response response = await dio.get(url, queryParameters: queryParameters);
+
+      for(int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
+        final result = await _geocodingService.fetchCoordinates(response.data['response']["body"]["items"]["item"][i]["rlteBsicAdres"]);
+        setState(() {
+          _latitude = result['latitude'].toString();
+          _longitude = result['longitude'].toString();
+
+          dataList.add([response.data["response"]["body"]["items"]["item"][i]["rlteTatsNm"], [_latitude, _longitude]]);
+        });
+        print(dataList);
+      }
+    } catch (e) {
+      // 오류 처리
+      print('Error: $e');
+    }
   }
 
   @override
