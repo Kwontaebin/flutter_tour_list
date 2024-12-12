@@ -1,93 +1,67 @@
-import 'package:dio/dio.dart';
+import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
-import 'package:flutter_tour_list/common/component/custom_elevatedButton.dart';
-import 'package:flutter_tour_list/common/component/custom_text_field.dart';
-import '../../common/const/data.dart';
-import '../component/geoCoding.dart';
+import 'package:flutter_tour_list/common/const/data.dart';
+import 'package:flutter_tour_list/common/function/sizeFn.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final NaverGeocodingService _geocodingService = NaverGeocodingService();
-  late var address = "";
-  List dataList = [];
-  String? _latitude;
-  String? _longitude;
+  final Completer<NaverMapController> mapControllerCompleter = Completer();
+  bool isMapInitialized = false; // 맵 초기화 상태
 
-  Future<void> _getCoordinates() async {
-    var dio = Dio();
-
-    String url = API_URL;
-
-    Map<String, dynamic> queryParameters = {
-      'serviceKey': API_SERVICES_KEY,
-      'pageNo': 1,
-      'numOfRows': 5,
-      'MobileOS': 'IOS',
-      'MobileApp': '서울 여행',
-      'baseYm': '202411',
-      'areaCd': 11,
-      'signguCd': 11110,
-      '_type': 'JSON',
-    };
-
+  // 지도 초기화하기
+  Future<void> _initialize() async {
     try {
-      Response response = await dio.get(url, queryParameters: queryParameters);
-
-      for(int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
-        final result = await _geocodingService.fetchCoordinates(response.data['response']["body"]["items"]["item"][i]["rlteBsicAdres"]);
-        setState(() {
-          _latitude = result['latitude'].toString();
-          _longitude = result['longitude'].toString();
-
-          dataList.add([response.data["response"]["body"]["items"]["item"][i]["rlteTatsNm"], [_latitude, _longitude]]);
-        });
-        print(dataList);
-      }
+      await NaverMapSdk.instance.initialize(
+        clientId: NAVER_MAP_KEY,
+        onAuthFailed: (e) => log("네이버맵 인증오류 : $e", name: "onAuthFailed"),
+      );
+      setState(() {
+        isMapInitialized = true; // 초기화 완료
+      });
     } catch (e) {
-      // 오류 처리
-      print('Error: $e');
+      log("네이버맵 초기화 중 오류: $e", name: "_initialize");
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: "네이버 지도",
-        showLeading: false
+        title: "서울 구경",
+        bgColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            CustomTextFieldWidget(
-              hintText: "",
-              textSpacing: true,
-              myControllerText: address,
-              onChanged: (value) {
-                address = value;
-              },
-            ),
-            const SizedBox(height: 16),
-            customElevatedButton(
-              context,
-              text: "button",
-              onPressed: _getCoordinates,
-            ),
-            const SizedBox(height: 16),
-            if (_latitude != null && _longitude != null) ...[
-              Text('Latitude: $_latitude'),
-              Text('Longitude: $_longitude'),
-            ]
-          ],
+      body: isMapInitialized ? Container(
+        width: double.infinity,
+        height: deviceHeight(context),
+        color: Colors.white,
+        child: NaverMap(
+          options: const NaverMapViewOptions(
+            indoorEnable: true,
+            locationButtonEnable: false,
+            consumeSymbolTapEvents: false,
+          ),
+          onMapReady: (controller) {
+            mapControllerCompleter.complete(controller);
+            log("onMapReady", name: "onMapReady");
+          },
         ),
+      ) : const Center(
+        child: CircularProgressIndicator(), // 초기화 중 로딩 표시
       ),
     );
   }

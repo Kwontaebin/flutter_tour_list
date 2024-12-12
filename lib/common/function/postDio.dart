@@ -19,8 +19,7 @@ Future<void> postDio({
 
     // 서버 응답 상태 코드가 200일 경우
     if (response.statusCode == 200) {
-      // print('Login successful: ${response.data}');
-      customToast(message: response.data["message"], bgColor: Colors.black);
+      print('Login successful: ${response.data["message"]}');
       onSuccess(response.data);
     }
   } catch (e) {

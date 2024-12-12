@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/searchScreen/view/search.dart';
+import 'package:flutter_tour_list/splashScreen/view/splash.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -26,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'tourList',
-      home: SearchScreen(),
+      home: SplashScreen(),
     );
   }
 }

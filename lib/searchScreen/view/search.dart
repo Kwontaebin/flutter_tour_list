@@ -2,7 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/const/data.dart';
+import 'package:flutter_tour_list/common/function/navigator.dart';
 import 'package:flutter_tour_list/common/function/postDio.dart';
+import 'package:flutter_tour_list/mainScreen/view/mainScreen.dart';
 import 'package:provider/provider.dart';
 import '../component/geoCoding.dart';
 
@@ -132,7 +134,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       context.read<DataProvider>().setDataList(dataList);
                     });
                   }
-                  print(context.read<DataProvider>().dataList);
+                  print(context.read<DataProvider>().dataList.length);
+
+                  if(context.read<DataProvider>().dataList.isNotEmpty) navigatorFn(context, const MainScreen());
                 } catch (e) {
                   print('Error: $e');
                 }
