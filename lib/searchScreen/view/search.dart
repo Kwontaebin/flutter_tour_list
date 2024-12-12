@@ -134,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       context.read<DataProvider>().setDataList(dataList);
                     });
                   }
-                  print(context.read<DataProvider>().dataList.length);
+                  print(context.read<DataProvider>().dataList[0]);
 
                   if(context.read<DataProvider>().dataList.isNotEmpty) navigatorFn(context, const MainScreen());
                 } catch (e) {
