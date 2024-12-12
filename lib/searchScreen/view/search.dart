@@ -1,7 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/const/data.dart';
 import 'package:flutter_tour_list/common/function/postDio.dart';
+
+import '../component/geoCoding.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -38,8 +41,13 @@ class _SearchScreenState extends State<SearchScreen> {
     '송파구',
     '강동구'
   ];
+  Map<String, dynamic> responseData = {};
 
   Map<String, dynamic> requestData = {};
+  final NaverGeocodingService _geocodingService = NaverGeocodingService();
+  List dataList = [];
+  String? _latitude;
+  String? _longitude;
 
   @override
   Widget build(BuildContext context) {
@@ -65,20 +73,59 @@ class _SearchScreenState extends State<SearchScreen> {
               color: Colors.black12,
               child: Center(
                 child: TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       requestData = {
                         'area': areaList[index],
                       };
                     });
 
-                    postDio(
+                    await postDio(
                       postData: requestData,
                       url: "search",
-                      onSuccess: (Map<String, dynamic> data) {
-                        print(data);
+                      onSuccess: (Map<String, dynamic> data) async {
+                        print(data["data"][0]);
+                        setState(() {
+                          responseData = data["data"][0];
+                        });
                       },
                     );
+
+                    print(responseData);
+
+                    // var dio = Dio();
+                    //
+                    // String url = API_URL;
+                    //
+                    // Map<String, dynamic> queryParameters = {
+                    //   'serviceKey': API_SERVICES_KEY,
+                    //   'pageNo': 1,
+                    //   'numOfRows': 5,
+                    //   'MobileOS': 'IOS',
+                    //   'MobileApp': '서울 여행',
+                    //   'baseYm': '202411',
+                    //   'areaCd': data["data"][0]["area_num"],
+                    //   'signguCd': data["data"][0]["detail_area_name"],
+                    //   '_type': 'JSON',
+                    // };
+                    //
+                    // try {
+                    //   Response response = await dio.get(url, queryParameters: queryParameters);
+                    //
+                    //   for(int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
+                    //     final result = await _geocodingService.fetchCoordinates(response.data['response']["body"]["items"]["item"][i]["rlteBsicAdres"]);
+                    //     setState(() {
+                    //       _latitude = result['latitude'].toString();
+                    //       _longitude = result['longitude'].toString();
+                    //
+                    //       dataList.add([response.data["response"]["body"]["items"]["item"][i]["rlteTatsNm"], [_latitude, _longitude]]);
+                    //     });
+                    //     print(dataList);
+                    //   }
+                    // } catch (e) {
+                    //   // 오류 처리
+                    //   print('Error: $e');
+                    // }
                   },
                   child: Text(
                     areaList[index],

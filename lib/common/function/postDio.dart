@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../component/custom_toast.dart';
 import '../const/data.dart';
 
-void postDio({
+Future<void> postDio({
   required Map<String, dynamic> postData,
   required String url,
   required Function(Map<String, dynamic> data) onSuccess,
@@ -21,7 +21,6 @@ void postDio({
     if (response.statusCode == 200) {
       // print('Login successful: ${response.data}');
       customToast(message: response.data["message"], bgColor: Colors.black);
-
       onSuccess(response.data);
     }
   } catch (e) {
