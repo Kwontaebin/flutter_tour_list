@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tour_list/mainScreen/view/mainScreen.dart';
 import 'package:flutter_tour_list/searchScreen/view/search.dart';
-import 'package:flutter_tour_list/splashScreen/view/splash.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
-  runApp(const MyApp());
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DataProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
