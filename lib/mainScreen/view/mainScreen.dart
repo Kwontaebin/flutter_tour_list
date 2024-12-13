@@ -6,7 +6,6 @@ import 'package:flutter_tour_list/common/const/data.dart';
 import 'package:flutter_tour_list/common/function/sizeFn.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:provider/provider.dart';
-
 import '../../searchScreen/view/search.dart';
 
 class MainScreen extends StatefulWidget {
@@ -21,6 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   bool isMapInitialized = false; // 맵 초기화 상태
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
+  final double _zoomLevel = 9.0;
 
   // 지도 초기화하기
   Future<void> _initialize() async {
@@ -41,24 +41,12 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _initialize();
-    addMarker();
-  }
-
-  void addMarker() {
-    List dataList = context.read<DataProvider>().dataList;
-
-    for(int i = 0; i < dataList.length; i++) {
-      final marker = NMarker(
-        id: dataList[i][0],
-        position: NLatLng(double.parse(dataList[i][3][0]), double.parse(dataList[i][3][0])),
-      );
-
-      print(marker);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    List dataList = context.read<DataProvider>().dataList;
+
     return Scaffold(
       appBar: const CustomAppBar(
         title: "서울 구경",
@@ -69,23 +57,43 @@ class _MainScreenState extends State<MainScreen> {
         height: deviceHeight(context),
         color: Colors.white,
         child: NaverMap(
-          options: const NaverMapViewOptions(
+          options: NaverMapViewOptions(
             indoorEnable: true,
             locationButtonEnable: false,
             consumeSymbolTapEvents: false,
+            initialCameraPosition: NCameraPosition(
+              target: NLatLng(double.parse(dataList[0][3][0]), double.parse(dataList[0][3][1])),
+              zoom: _zoomLevel,
+              bearing: 0,
+              tilt: 30,
+            ),
           ),
           onMapReady: (controller) {
             mapControllerCompleter.complete(controller);
             log("onMapReady", name: "onMapReady");
 
-            final marker = NMarker(
-              id: 'current location',
-              position: NLatLng(37.577224, 126.977397),
-            );
+            for(int i = 0; i < dataList.length; i++) {
+              final marker = NMarker(
+                id: dataList[i][0],
+                position: NLatLng(double.parse(dataList[i][3][0]),
+                    double.parse(dataList[i][3][1])),
+              );
 
-            setState(() {
-              controller.addOverlay(marker);
-            });
+              setState(() {
+                mapList.add(marker.position);
+                controller.addOverlay(marker);
+              });
+
+              final onMarkerInfoMap = NInfoWindow.onMarker(
+                id: i.toString(),
+                text: dataList[i][0],
+
+              );
+
+              marker.openInfoWindow(onMarkerInfoMap);
+            }
+
+            _setBounds(mapList);
           },
         ),
       ) : const Center(
@@ -98,7 +106,7 @@ class _MainScreenState extends State<MainScreen> {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
     NCameraUpdate newCamera =
     NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
-    print("bounds : $bounds");
+    // print("bounds : $bounds");
     _mapController?.updateCamera(newCamera);
   }
 }
