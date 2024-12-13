@@ -21,6 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
   final double _zoomLevel = 10.0;
+  double _bottomSheetHeight = -300; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
 
   // 지도 초기화하기
   Future<void> _initialize() async {
@@ -46,6 +47,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     List dataList = context.read<DataProvider>().dataList;
+    NMarker? previousMarker;
+    NMarker marker;
 
     return Scaffold(
       appBar: const CustomAppBar(
@@ -57,60 +60,123 @@ class _MainScreenState extends State<MainScreen> {
               width: double.infinity,
               height: deviceHeight(context),
               color: Colors.white,
-              child: NaverMap(
-                options: NaverMapViewOptions(
-                  indoorEnable: true,
-                  locationButtonEnable: false,
-                  consumeSymbolTapEvents: false,
-                  initialCameraPosition: NCameraPosition(
-                    target: NLatLng(double.parse(dataList[0][3][0]),
-                        double.parse(dataList[0][3][1])),
-                    zoom: _zoomLevel,
-                    bearing: 0,
-                    tilt: 30,
-                  ),
-                ),
-                onMapReady: (controller) {
-                  mapControllerCompleter.complete(controller);
-                  log("onMapReady", name: "onMapReady");
-
-                  for (int i = 0; i < dataList.length; i++) {
-                    final marker = NMarker(
-                      id: dataList[i][0],
-                      position: NLatLng(
-                        double.parse(dataList[i][3][0]),
-                        double.parse(dataList[i][3][1]),
+              child: Stack(
+                children: [
+                  NaverMap(
+                    options: NaverMapViewOptions(
+                      indoorEnable: true,
+                      locationButtonEnable: false,
+                      consumeSymbolTapEvents: false,
+                      initialCameraPosition: NCameraPosition(
+                        target: NLatLng(
+                          double.parse(dataList[0][3][0]),
+                          double.parse(dataList[0][3][1]),
+                        ),
+                        zoom: _zoomLevel,
+                        bearing: 0,
+                        tilt: 30,
                       ),
-                      size: const Size(40, 50),
-                    );
+                    ),
+                    onMapReady: (controller) {
+                      mapControllerCompleter.complete(controller);
+                      log("onMapReady", name: "onMapReady");
 
-                    setState(() {
-                      mapList.add(marker.position);
-                      controller.addOverlay(marker);
-                    });
+                      for (int i = 0; i < dataList.length; i++) {
+                        marker = NMarker(
+                          id: i.toString(),
+                          position: NLatLng(
+                            double.parse(dataList[i][3][0]),
+                            double.parse(dataList[i][3][1]),
+                          ),
+                          size: const Size(40, 50),
+                        );
 
-                    final onMarkerInfoMap = NInfoWindow.onMarker(
-                      id: i.toString(),
-                      text: dataList[i][0],
-                    );
+                        setState(() {
+                          mapList.add(marker.position);
+                          controller.addOverlay(marker);
+                        });
 
-                    marker.openInfoWindow(onMarkerInfoMap);
-                  }
+                        marker.setOnTapListener((NMarker tappedMarker) {
+                          setState(() {
+                            if (previousMarker != null) previousMarker!.setIconTintColor(Colors.transparent);
+                            tappedMarker.setIconTintColor(Colors.blue);
+                            previousMarker = tappedMarker;
 
-                  _setBounds(mapList);
-                },
+                            print(previousMarker?.info.id);
+
+                            // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
+                            _bottomSheetHeight = 0.0;
+
+                            // 지도 카메라 이동
+                            NCameraPosition(
+                              target: NLatLng(
+                                double.parse(dataList[int.parse(tappedMarker.info.id)][3][0]),
+                                double.parse(dataList[int.parse(tappedMarker.info.id)][3][1]),
+                              ),
+                              zoom: 15.0, // 줌 레벨
+                              bearing: 50,
+                              tilt: 20,
+                            );
+                          });
+                        });
+
+                        final onMarkerInfoMap = NInfoWindow.onMarker(
+                          id: i.toString(),
+                          text: dataList[i][0],
+                        );
+
+                        marker.openInfoWindow(onMarkerInfoMap);
+                      }
+
+                      _setBounds(mapList);
+                    },
+                  ),
+                  // 하단 슬라이드 가능한 위젯
+                  AnimatedPositioned(
+                    bottom: _bottomSheetHeight,
+                    left: 0,
+                    right: 0,
+                    duration: const Duration(milliseconds: 300),
+                    child: GestureDetector(
+                      onVerticalDragUpdate: (details) {
+                        // 드래그하여 위젯 숨기기
+                        if (details.primaryDelta! < 0) {
+                          setState(() {
+                            _bottomSheetHeight = 0.0;
+                          });
+                        } else if (details.primaryDelta! > 0) {
+                          setState(() {
+                            _bottomSheetHeight = -300.0; // 아래로 밀어 숨김
+                          });
+                        }
+                      },
+                      child: Container(
+                        height: 300,
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            ListTile(
+                              title: const Text("상세 정보"),
+                              subtitle: Text(
+                                previousMarker != null
+                                    ? '위치: ${dataList[int.parse(previousMarker!.info.id)][0]}'
+                                    : '위치: 선택된 마커 없음',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ) : const Center(
-              child: CircularProgressIndicator() // 초기화 중 로딩 표시
-            ),
+            ) : const Center(child: CircularProgressIndicator()), // 초기화 중 로딩 표시
     );
   }
 
   void _setBounds(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
-    NCameraUpdate newCamera =
-        NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
-    // print("bounds : $bounds");
+    NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     _mapController?.updateCamera(newCamera);
   }
 }
