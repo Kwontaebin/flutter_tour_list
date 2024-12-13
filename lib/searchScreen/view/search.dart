@@ -105,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 Map<String, dynamic> queryParameters = {
                   'serviceKey': API_SERVICES_KEY,
                   'pageNo': 1,
-                  'numOfRows': 10,
+                  'numOfRows': 5,
                   'MobileOS': 'IOS',
                   'MobileApp': '서울 여행',
                   'baseYm': '202411',

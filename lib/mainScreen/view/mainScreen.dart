@@ -20,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   bool isMapInitialized = false; // 맵 초기화 상태
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
-  final double _zoomLevel = 9.0;
+  final double _zoomLevel = 10.0;
 
   // 지도 초기화하기
   Future<void> _initialize() async {
@@ -52,60 +52,64 @@ class _MainScreenState extends State<MainScreen> {
         title: "서울 구경",
         bgColor: Colors.white,
       ),
-      body: isMapInitialized ? Container(
-        width: double.infinity,
-        height: deviceHeight(context),
-        color: Colors.white,
-        child: NaverMap(
-          options: NaverMapViewOptions(
-            indoorEnable: true,
-            locationButtonEnable: false,
-            consumeSymbolTapEvents: false,
-            initialCameraPosition: NCameraPosition(
-              target: NLatLng(double.parse(dataList[0][3][0]), double.parse(dataList[0][3][1])),
-              zoom: _zoomLevel,
-              bearing: 0,
-              tilt: 30,
+      body: isMapInitialized
+          ? Container(
+              width: double.infinity,
+              height: deviceHeight(context),
+              color: Colors.white,
+              child: NaverMap(
+                options: NaverMapViewOptions(
+                  indoorEnable: true,
+                  locationButtonEnable: false,
+                  consumeSymbolTapEvents: false,
+                  initialCameraPosition: NCameraPosition(
+                    target: NLatLng(double.parse(dataList[0][3][0]),
+                        double.parse(dataList[0][3][1])),
+                    zoom: _zoomLevel,
+                    bearing: 0,
+                    tilt: 30,
+                  ),
+                ),
+                onMapReady: (controller) {
+                  mapControllerCompleter.complete(controller);
+                  log("onMapReady", name: "onMapReady");
+
+                  for (int i = 0; i < dataList.length; i++) {
+                    final marker = NMarker(
+                      id: dataList[i][0],
+                      position: NLatLng(
+                        double.parse(dataList[i][3][0]),
+                        double.parse(dataList[i][3][1]),
+                      ),
+                      size: const Size(40, 50),
+                    );
+
+                    setState(() {
+                      mapList.add(marker.position);
+                      controller.addOverlay(marker);
+                    });
+
+                    final onMarkerInfoMap = NInfoWindow.onMarker(
+                      id: i.toString(),
+                      text: dataList[i][0],
+                    );
+
+                    marker.openInfoWindow(onMarkerInfoMap);
+                  }
+
+                  _setBounds(mapList);
+                },
+              ),
+            ) : const Center(
+              child: CircularProgressIndicator() // 초기화 중 로딩 표시
             ),
-          ),
-          onMapReady: (controller) {
-            mapControllerCompleter.complete(controller);
-            log("onMapReady", name: "onMapReady");
-
-            for(int i = 0; i < dataList.length; i++) {
-              final marker = NMarker(
-                id: dataList[i][0],
-                position: NLatLng(double.parse(dataList[i][3][0]),
-                    double.parse(dataList[i][3][1])),
-              );
-
-              setState(() {
-                mapList.add(marker.position);
-                controller.addOverlay(marker);
-              });
-
-              final onMarkerInfoMap = NInfoWindow.onMarker(
-                id: i.toString(),
-                text: dataList[i][0],
-
-              );
-
-              marker.openInfoWindow(onMarkerInfoMap);
-            }
-
-            _setBounds(mapList);
-          },
-        ),
-      ) : const Center(
-        child: CircularProgressIndicator(), // 초기화 중 로딩 표시
-      ),
     );
   }
 
   void _setBounds(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
     NCameraUpdate newCamera =
-    NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
+        NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     // print("bounds : $bounds");
     _mapController?.updateCamera(newCamera);
   }
