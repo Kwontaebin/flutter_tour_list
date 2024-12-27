@@ -77,9 +77,20 @@ class _MainScreenState extends State<MainScreen> {
                         tilt: 30,
                       ),
                     ),
+
                     onMapReady: (controller) {
                       mapControllerCompleter.complete(controller);
                       log("onMapReady", name: "onMapReady");
+
+                      final marker1 = NMarker(
+                        id: 'current location2',
+                        position: const NLatLng(35.694198, 128.489457),
+                      );
+
+                      setState(() {
+                        mapList.add(marker1.position);
+                        controller.addOverlay(marker1);
+                      });
 
                       for (int i = 0; i < dataList.length; i++) {
                         marker = NMarker(
@@ -93,6 +104,7 @@ class _MainScreenState extends State<MainScreen> {
 
                         setState(() {
                           mapList.add(marker.position);
+                          print(marker);
                           controller.addOverlay(marker);
                         });
 
@@ -102,20 +114,25 @@ class _MainScreenState extends State<MainScreen> {
                             tappedMarker.setIconTintColor(Colors.blue);
                             previousMarker = tappedMarker;
 
-                            print(previousMarker?.info.id);
+                            print(dataList[int.parse(tappedMarker.info.id)][3][0]);
+                            print(dataList[int.parse(tappedMarker.info.id)][3][1]);
 
                             // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
                             _bottomSheetHeight = 0.0;
 
-                            // 지도 카메라 이동
-                            NCameraPosition(
-                              target: NLatLng(
-                                double.parse(dataList[int.parse(tappedMarker.info.id)][3][0]),
-                                double.parse(dataList[int.parse(tappedMarker.info.id)][3][1]),
+                            NaverMapViewOptions(
+                              indoorEnable: true,
+                              locationButtonEnable: false,
+                              consumeSymbolTapEvents: false,
+                              initialCameraPosition: NCameraPosition(
+                                target: NLatLng(
+                                  double.parse(dataList[int.parse(tappedMarker.info.id)][3][0]),
+                                  double.parse(dataList[int.parse(tappedMarker.info.id)][3][1]),
+                                ),
+                                zoom: 20, // 줌 레벨
+                                bearing: 50,
+                                tilt: 20,
                               ),
-                              zoom: 15.0, // 줌 레벨
-                              bearing: 50,
-                              tilt: 20,
                             );
                           });
                         });
@@ -170,12 +187,15 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ],
               ),
-            ) : const Center(child: CircularProgressIndicator()), // 초기화 중 로딩 표시
+            )
+
+          : const Center(child: CircularProgressIndicator()), // 초기화 중 로딩 표시
     );
   }
 
   void _setBounds(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
+    print(positions);
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     _mapController?.updateCamera(newCamera);
   }
