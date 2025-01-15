@@ -110,33 +110,29 @@ class _SearchScreenState extends State<SearchScreen> {
             '_type': 'JSON',
           };
 
-          try {
-            Response response = await dio.get(url, queryParameters: queryParameters);
+          Response response = await dio.get(url, queryParameters: queryParameters);
 
-            for (int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
-              final item = response.data["response"]["body"]["items"]["item"][i];
-              final result = await _geocodingService.fetchCoordinates(item["rlteBsicAdres"]);
+          for (int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
+            final item = response.data["response"]["body"]["items"]["item"][i];
+            final result = await _geocodingService.fetchCoordinates(item["rlteBsicAdres"]);
 
-              setState(() {
-                _latitude = result['latitude'].toString();
-                _longitude = result['longitude'].toString();
+            setState(() {
+              _latitude = result['latitude'].toString();
+              _longitude = result['longitude'].toString();
 
-                dataList.add([
-                  item["rlteTatsNm"],
-                  item["rlteBsicAdres"],
-                  item["rlteCtgryMclsNm"],
-                  [_latitude, _longitude]
-                ]);
-                context.read<DataProvider>().setDataList(dataList);
-              });
-            }
-            print(context.read<DataProvider>().dataList[0]);
+              dataList.add([
+                item["rlteTatsNm"],
+                item["rlteBsicAdres"],
+                item["rlteCtgryMclsNm"],
+                [_latitude, _longitude]
+              ]);
+              context.read<DataProvider>().setDataList(dataList);
+            });
+          }
+          print(context.read<DataProvider>().dataList[0]);
 
-            if(context.read<DataProvider>().dataList.isNotEmpty) {
-              navigatorFn(context, const MainScreen());
-            }
-          } catch (e) {
-            print('Error: $e');
+          if(context.read<DataProvider>().dataList.isNotEmpty) {
+            navigatorFn(context, const MainScreen());
           }
         } else {
           print("프론트: ${data["message"]}");

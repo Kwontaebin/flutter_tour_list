@@ -30,14 +30,24 @@ Future<void> postDio({
     if (e is DioException) {
       print(e.response?.statusCode);
       print(e.response?.statusMessage);
-      onData(e.response?.data);
 
-      // 해당 변수로 에러 상태 코드를 확인 가능!
-      int? errCode = e.response?.statusCode;
-      print("error code $errCode");
+      if (e.response?.data != null) {
+        onData(e.response?.data);
 
-      print('데이터 형식 수정 부탁: ${e.response?.data["message"]}');
-      customToast(message: e.response?.data["message"], bgColor: Colors.black);
+        // 해당 변수로 에러 상태 코드를 확인 가능!
+        int? errCode = e.response?.statusCode;
+        print("error code $errCode");
+
+        print('데이터 형식 수정 부탁: ${e.response?.data["message"]}');
+        customToast(
+            message: e.response?.data["message"], bgColor: Colors.black);
+      } else {
+        print("서버 연결이 안 돼 있습니다");
+        customToast(
+          message: "서버 연결이 안 돼 있습니다",
+          bgColor: Colors.black
+        );
+      }
     }
   }
 }
