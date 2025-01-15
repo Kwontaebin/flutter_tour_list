@@ -59,7 +59,27 @@ class _SubScreenState extends State<SubScreen> {
 
               print(mapList);
 
-              _setBounds(mapList);
+              _setBoundList(mapList);
+
+              marker1.setOnTapListener((NMarker tappedMarker) {
+                print(tappedMarker);
+                setState(() {
+                  const NaverMapViewOptions(
+                    indoorEnable: true,
+                    locationButtonEnable: false,
+                    consumeSymbolTapEvents: false,
+
+                    initialCameraPosition: NCameraPosition(
+                      target: NLatLng(37.507310, 127.043614),
+                      zoom: 100.0,
+                      bearing: 0,
+                      tilt: 30,
+                    ),
+                  );
+                });
+
+                _setBound(const NLatLng(37.507310, 127.043614));
+              });
             },
           ),
         ],
@@ -67,10 +87,26 @@ class _SubScreenState extends State<SubScreen> {
     );
   }
 
-  void _setBounds(List<NLatLng> positions) {
+  void _setBoundList(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     print("bounds : $bounds");
+    _mapController?.updateCamera(newCamera);
+  }
+
+  void _setBound(NLatLng position) {
+    // 단일 좌표를 기준으로 경계를 생성
+    NLatLngBounds bounds = NLatLngBounds(
+      southWest: position,
+      northEast: position,
+    );
+
+    NCameraUpdate newCamera = NCameraUpdate.fitBounds(
+      bounds,
+      padding: const EdgeInsets.all(100.0),
+    );
+
+    print("bound : $bounds");
     _mapController?.updateCamera(newCamera);
   }
 }
