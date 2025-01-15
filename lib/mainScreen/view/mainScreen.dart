@@ -18,13 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final Completer<NaverMapController> mapControllerCompleter = Completer();
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
-  final double _zoomLevel = 10.0;
   double _bottomSheetHeight = -300; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
