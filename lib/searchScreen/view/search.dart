@@ -31,7 +31,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   List<dynamic> areaList = [
-    '종대구',
+    '종로구',
     '중구',
     '용산구',
     '성동구',
@@ -134,8 +134,6 @@ class _SearchScreenState extends State<SearchScreen> {
           if(context.read<DataProvider>().dataList.isNotEmpty) {
             navigatorFn(context, const MainScreen());
           }
-        } else {
-          print("프론트: ${data["message"]}");
         }
       },
     );
