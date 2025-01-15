@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
@@ -81,6 +80,66 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  void storageData(BuildContext context, int index) async {
+    setState(() {
+      requestData = {
+        'area': areaList[index],
+      };
+    });
+
+    await postDio(
+      postData: requestData,
+      url: "search",
+      onSuccess: (Map<String, dynamic> data) async {
+        setState(() {
+          responseData = data["data"][0];
+        });
+      },
+    );
+    String url = API_URL;
+
+    Map<String, dynamic> queryParameters = {
+      'serviceKey': API_SERVICES_KEY,
+      'pageNo': 1,
+      'numOfRows': 5,
+      'MobileOS': 'IOS',
+      'MobileApp': '서울 여행',
+      'baseYm': '202411',
+      'areaCd': responseData["area_num"],
+      'signguCd': responseData["detail_area_num"],
+      '_type': 'JSON',
+    };
+
+    try {
+      Response response = await dio.get(url, queryParameters: queryParameters);
+
+      for (int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
+        final item = response.data["response"]["body"]["items"]["item"][i];
+        final result = await _geocodingService.fetchCoordinates(item["rlteBsicAdres"]);
+
+        setState(() {
+          _latitude = result['latitude'].toString();
+          _longitude = result['longitude'].toString();
+
+          dataList.add([
+            item["rlteTatsNm"],
+            item["rlteBsicAdres"],
+            item["rlteCtgryMclsNm"],
+            [_latitude, _longitude]
+          ]);
+          context.read<DataProvider>().setDataList(dataList);
+        });
+      }
+      print(context.read<DataProvider>().dataList[0]);
+
+      if(context.read<DataProvider>().dataList.isNotEmpty) {
+        navigatorFn(context, const MainScreen());
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,61 +162,7 @@ class _SearchScreenState extends State<SearchScreen> {
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
               onTap: () async {
-                setState(() {
-                  requestData = {
-                    'area': areaList[index],
-                  };
-                });
-
-                await postDio(
-                  postData: requestData,
-                  url: "search",
-                  onSuccess: (Map<String, dynamic> data) async {
-                    setState(() {
-                      responseData = data["data"][0];
-                    });
-                  },
-                );
-                String url = API_URL;
-
-                Map<String, dynamic> queryParameters = {
-                  'serviceKey': API_SERVICES_KEY,
-                  'pageNo': 1,
-                  'numOfRows': 5,
-                  'MobileOS': 'IOS',
-                  'MobileApp': '서울 여행',
-                  'baseYm': '202411',
-                  'areaCd': responseData["area_num"],
-                  'signguCd': responseData["detail_area_num"],
-                  '_type': 'JSON',
-                };
-
-                try {
-                  Response response = await dio.get(url, queryParameters: queryParameters);
-
-                  for (int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
-                    final item = response.data["response"]["body"]["items"]["item"][i];
-                    final result = await _geocodingService.fetchCoordinates(item["rlteBsicAdres"]);
-
-                    setState(() {
-                      _latitude = result['latitude'].toString();
-                      _longitude = result['longitude'].toString();
-
-                      dataList.add([
-                        item["rlteTatsNm"],
-                        item["rlteBsicAdres"],
-                        item["rlteCtgryMclsNm"],
-                        [_latitude, _longitude]
-                      ]);
-                      context.read<DataProvider>().setDataList(dataList);
-                    });
-                  }
-                  print(context.read<DataProvider>().dataList[0]);
-
-                  if(context.read<DataProvider>().dataList.isNotEmpty) navigatorFn(context, const MainScreen());
-                } catch (e) {
-                  print('Error: $e');
-                }
+                storageData(context, index);
               },
               child: Card(
                 color: Colors.black12,

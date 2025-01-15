@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'tourList',
-      home: SplashScreen(),
+      home: SearchScreen(),
     );
   }
 }
