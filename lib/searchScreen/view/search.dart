@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/const/data.dart';
 import 'package:flutter_tour_list/common/function/navigator.dart';
@@ -62,6 +65,21 @@ class _SearchScreenState extends State<SearchScreen> {
   String? _latitude;
   String? _longitude;
   var dio = Dio();
+
+  @override
+  void initState() {
+    super.initState();
+
+    getNaverMap();
+  }
+
+  void getNaverMap() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await NaverMapSdk.instance.initialize(
+      clientId: NAVER_MAP_KEY,
+      onAuthFailed: (ex) => log("인증 오류 ${ex.message}"),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
