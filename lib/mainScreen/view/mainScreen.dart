@@ -44,20 +44,6 @@ class _MainScreenState extends State<MainScreen> {
           child: Stack(
             children: [
               NaverMap(
-                options: NaverMapViewOptions(
-                  indoorEnable: true,
-                  locationButtonEnable: false,
-                  consumeSymbolTapEvents: false,
-                  initialCameraPosition: NCameraPosition(
-                    target: NLatLng(
-                      double.parse(dataList[0][3][0]),
-                      double.parse(dataList[0][3][1]),
-                    ),
-                    zoom: _zoomLevel,
-                    bearing: 0,
-                    tilt: 30,
-                  ),
-                ),
                 onMapReady: (controller) {
                   _mapController = controller;
                   mapControllerCompleter.complete(controller);
@@ -86,9 +72,6 @@ class _MainScreenState extends State<MainScreen> {
                         }
                         tappedMarker.setIconTintColor(Colors.blue);
                         previousMarker = tappedMarker;
-
-                        print(dataList[int.parse(tappedMarker.info.id)][3][0]);
-                        print(dataList[int.parse(tappedMarker.info.id)][3][1]);
 
                         // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
                         _bottomSheetHeight = 0.0;
@@ -124,7 +107,7 @@ class _MainScreenState extends State<MainScreen> {
                     marker.openInfoWindow(onMarkerInfoMap);
                   }
 
-                  _setBounds(mapList);
+                  _setBoundList(mapList);
                 },
               ),
               // 하단 슬라이드 가능한 위젯
@@ -170,11 +153,10 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void _setBounds(List<NLatLng> positions) {
+  void _setBoundList(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
     print(positions);
-    NCameraUpdate newCamera =
-        NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
+    NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     _mapController?.updateCamera(newCamera);
   }
 
@@ -182,13 +164,11 @@ class _MainScreenState extends State<MainScreen> {
     // 여유를 줄 거리(단위: 위도/경도 약 0.001 ~ 0.01 범위에서 적절히 설정)
     const double offset = 0.005;
 
-    // 경계를 position 중심으로 확장
     NLatLngBounds bounds = NLatLngBounds(
       southWest: NLatLng(position.latitude - offset, position.longitude - offset),
       northEast: NLatLng(position.latitude + offset, position.longitude + offset),
     );
 
-    // 카메라 업데이트
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(
       bounds,
       padding: const EdgeInsets.all(50.0), // 주변 여백 조정
@@ -197,5 +177,4 @@ class _MainScreenState extends State<MainScreen> {
     print("Updated bounds : $bounds");
     _mapController?.updateCamera(newCamera);
   }
-
 }
