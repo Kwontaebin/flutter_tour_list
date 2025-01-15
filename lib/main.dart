@@ -1,10 +1,18 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:flutter_tour_list/common/const/data.dart';
 import 'package:flutter_tour_list/mainScreen/view/subScreen.dart';
 import 'package:flutter_tour_list/searchScreen/view/search.dart';
-import 'package:flutter_tour_list/splashScreen/view/splash.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NaverMapSdk.instance.initialize(
+    clientId: NAVER_MAP_KEY,
+    onAuthFailed: (ex) => log("인증 오류 ${ex.message}"),
+  );
+
   runApp(
     MultiProvider(
       providers: [
