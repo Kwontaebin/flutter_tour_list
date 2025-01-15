@@ -63,16 +63,6 @@ class _MainScreenState extends State<MainScreen> {
                   mapControllerCompleter.complete(controller);
                   log("onMapReady", name: "onMapReady");
 
-                  final marker1 = NMarker(
-                    id: 'current location2',
-                    position: const NLatLng(35.694198, 128.489457),
-                  );
-
-                  setState(() {
-                    mapList.add(marker1.position);
-                    controller.addOverlay(marker1);
-                  });
-
                   for (int i = 0; i < dataList.length; i++) {
                     marker = NMarker(
                       id: i.toString(),
@@ -91,8 +81,9 @@ class _MainScreenState extends State<MainScreen> {
 
                     marker.setOnTapListener((NMarker tappedMarker) {
                       setState(() {
-                        if (previousMarker != null)
+                        if (previousMarker != null) {
                           previousMarker!.setIconTintColor(Colors.transparent);
+                        }
                         tappedMarker.setIconTintColor(Colors.blue);
                         previousMarker = tappedMarker;
 
@@ -108,14 +99,10 @@ class _MainScreenState extends State<MainScreen> {
                           consumeSymbolTapEvents: false,
                           initialCameraPosition: NCameraPosition(
                             target: NLatLng(
-                              double.parse(
-                                  dataList[int.parse(tappedMarker.info.id)][3]
-                                      [0]),
-                              double.parse(
-                                  dataList[int.parse(tappedMarker.info.id)][3]
-                                      [1]),
+                              double.parse(dataList[int.parse(tappedMarker.info.id)][3][0]),
+                              double.parse(dataList[int.parse(tappedMarker.info.id)][3][1]),
                             ),
-                            zoom: 20, // 줌 레벨
+                            zoom: 15,
                             bearing: 0,
                             tilt: 30,
                           ),
@@ -179,7 +166,8 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ],
           ),
-        ));
+        ),
+    );
   }
 
   void _setBounds(List<NLatLng> positions) {
@@ -191,18 +179,23 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _setBound(NLatLng position) {
-    // 단일 좌표를 기준으로 경계를 생성
+    // 여유를 줄 거리(단위: 위도/경도 약 0.001 ~ 0.01 범위에서 적절히 설정)
+    const double offset = 0.005;
+
+    // 경계를 position 중심으로 확장
     NLatLngBounds bounds = NLatLngBounds(
-      southWest: position,
-      northEast: position,
+      southWest: NLatLng(position.latitude - offset, position.longitude - offset),
+      northEast: NLatLng(position.latitude + offset, position.longitude + offset),
     );
 
+    // 카메라 업데이트
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(
       bounds,
-      padding: const EdgeInsets.all(100.0),
+      padding: const EdgeInsets.all(50.0), // 주변 여백 조정
     );
 
-    print("bound : $bounds");
+    print("Updated bounds : $bounds");
     _mapController?.updateCamera(newCamera);
   }
+
 }
