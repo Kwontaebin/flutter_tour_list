@@ -4,9 +4,10 @@ import '../component/custom_toast.dart';
 import '../const/data.dart';
 
 Future<void> postDio({
-  required Map<String, dynamic> postData,
+  Map<String, dynamic>? postData,
   required String url,
-  required Function(Map<String, dynamic> data) onSuccess,
+  required Function(Map<String, dynamic> data) onData,
+  Options? options,
 }) async {
   Dio dio = Dio();
 
@@ -15,19 +16,25 @@ Future<void> postDio({
     Response response = await dio.post(
       "$IP/$url",
       data: postData,
+      options: options,
     );
 
     // 서버 응답 상태 코드가 200일 경우
     if (response.statusCode == 200) {
-      print('Login successful: ${response.data["message"]}');
-      onSuccess(response.data);
+      print(response.data);
+      customToast(message: response.data["message"], bgColor: Colors.black);
+      onData(response.data);
     }
   } catch (e) {
     // 네트워크 오류 또는 기타 예외 처리
     if (e is DioException) {
+      print(e.response?.statusCode);
+      print(e.response?.statusMessage);
+      onData(e.response?.data);
+
       // 해당 변수로 에러 상태 코드를 확인 가능!
       int? errCode = e.response?.statusCode;
-      print(errCode);
+      print("error code $errCode");
 
       print('데이터 형식 수정 부탁: ${e.response?.data["message"]}');
       customToast(message: e.response?.data["message"], bgColor: Colors.black);
