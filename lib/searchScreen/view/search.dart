@@ -145,6 +145,33 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  Future<void> getLocationInfo(double latitude, double longitude) async {
+    Dio dio = Dio();
+
+    final url = 'https://naveropenapi.apis.naver.com/map-reversegeocode/v2/gc?coords=$longitude,$latitude&orders=legalcode&output=json';
+
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'X-Naver-Client-Id': NAVER_MAP_KEY,  // 네이버 클라이언트 ID
+            'X-Naver-Client-Secret': NAVER_MAP_SECRET_KEY,  // 네이버 클라이언트 시크릿
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        var data = response.data;
+        print(data); // 위치 정보 출력
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Request failed: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,6 +195,7 @@ class _SearchScreenState extends State<SearchScreen> {
             return GestureDetector(
               onTap: () async {
                 storageData(context, index);
+                // getLocationInfo(37.564764, 126.9818075);
               },
               child: Card(
                 color: Colors.black12,
