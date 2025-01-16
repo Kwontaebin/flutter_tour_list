@@ -62,6 +62,7 @@ class _SearchScreenState extends State<SearchScreen> {
     '송파구',
     '강동구'
   ];
+
   Map<String, dynamic> responseData = {}; // 응답을 받는 데이터
   Map<String, dynamic> requestData = {}; // 요청을 보내는 데이트
   final NaverGeocodingService _geocodingService = NaverGeocodingService();
@@ -134,7 +135,7 @@ class _SearchScreenState extends State<SearchScreen> {
               context.read<DataProvider>().setDataList(dataList);
             });
           }
-          print(context.read<DataProvider>().dataList[0]);
+          print(context.read<DataProvider>().dataList.length);
 
           if(context.read<DataProvider>().dataList.isNotEmpty) {
             navigatorFn(context, const MainScreen());
