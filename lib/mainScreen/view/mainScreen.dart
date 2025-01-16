@@ -55,14 +55,16 @@ class _MainScreenState extends State<MainScreen> {
                     );
 
                     setState(() {
-                      mapList.add(marker.position);
-                      print(marker);
-                      controller.addOverlay(marker);
+                      if(mounted) {
+                        mapList.add(marker.position);
+                        print(marker);
+                        controller.addOverlay(marker);
+                      }
                     });
 
                     marker.setOnTapListener((NMarker tappedMarker) {
                       setState(() {
-                        if (previousMarker != null) {
+                        if (previousMarker != null && mounted) {
                           previousMarker!.setIconTintColor(Colors.transparent);
                         }
                         tappedMarker.setIconTintColor(Colors.blue);
