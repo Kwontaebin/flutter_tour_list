@@ -30,6 +30,7 @@ class _MainScreenState extends State<MainScreen> {
         appBar: const CustomAppBar(
           title: "서울 구경",
           bgColor: Colors.white,
+          showLeading: true,
         ),
         body: Container(
           width: double.infinity,

@@ -20,6 +20,11 @@ class DataProvider with ChangeNotifier {
 
     notifyListeners();
   }
+
+  Future<void> clearDataList() async {
+    _dataList.clear(); // 저장한 값 삭제
+    notifyListeners();
+  }
 }
 
 class SearchScreen extends StatefulWidget {

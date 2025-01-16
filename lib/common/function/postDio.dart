@@ -22,7 +22,7 @@ Future<void> postDio({
     // 서버 응답 상태 코드가 200일 경우
     if (response.statusCode == 200) {
       print(response.data);
-      customToast(message: response.data["message"], bgColor: Colors.black);
+      // customToast(message: response.data["message"], bgColor: Colors.black);
       onData(response.data);
     }
   } catch (e) {
@@ -39,8 +39,7 @@ Future<void> postDio({
         print("error code $errCode");
 
         print('데이터 형식 수정 부탁: ${e.response?.data["message"]}');
-        customToast(
-            message: e.response?.data["message"], bgColor: Colors.black);
+        customToast(message: e.response?.data["message"], bgColor: Colors.black);
       } else {
         print("서버 연결이 안 돼 있습니다");
         customToast(
