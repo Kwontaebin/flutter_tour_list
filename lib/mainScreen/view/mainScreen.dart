@@ -20,6 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
   double _bottomSheetHeight = 0.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
+  String _clickedMarkerId = '';
 
   @override
   void initState() {
@@ -57,17 +58,6 @@ class _MainScreenState extends State<MainScreen> {
                   setState(() {
                     final newLatLng = NLatLng(latLng.latitude, latLng.longitude);
                     mapList.add(newLatLng);
-
-                    // // Add a marker for the new location
-                    // final newMarker = NMarker(
-                    //   id: 'location $num',
-                    //   position: newLatLng,
-                    // );
-                    // _mapController?.addOverlay(newMarker);
-                    //
-                    // print(mapList);
-
-                    // 명동 남대문로 81 롯데백화점
                   });
                 },
 
@@ -105,6 +95,8 @@ class _MainScreenState extends State<MainScreen> {
 
                         // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
                         _bottomSheetHeight = 0.0;
+
+                        _clickedMarkerId = tappedMarker.info.id;
 
                         NaverMapViewOptions(
                           indoorEnable: true,
