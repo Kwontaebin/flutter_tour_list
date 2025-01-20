@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewExample extends StatefulWidget {
-  const WebViewExample({super.key});
+  final String linkUrl;
+
+  const WebViewExample({
+    super.key,
+    required this.linkUrl,
+  });
 
   @override
   _WebViewExampleState createState() => _WebViewExampleState();
@@ -16,7 +21,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted) // JavaScript 활성화
-      ..loadRequest(Uri.parse('https://app.catchtable.co.kr/ct/shop/hidirao_coex')); // 원하는 URL 로드
+      ..loadRequest(Uri.parse(widget.linkUrl)); // 원하는 URL 로드
   }
 
   @override

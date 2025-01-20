@@ -20,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
   double _bottomSheetHeight = 0.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
-  String _clickedMarkerId = '';
+  int _clickedMarkerId = 0;
 
   @override
   void initState() {
@@ -96,7 +96,9 @@ class _MainScreenState extends State<MainScreen> {
                         // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
                         _bottomSheetHeight = 0.0;
 
-                        _clickedMarkerId = tappedMarker.info.id;
+                        print("marker id: ${tappedMarker.info.id}");
+
+                        _clickedMarkerId = int.parse(tappedMarker.info.id);
 
                         NaverMapViewOptions(
                           indoorEnable: true,
@@ -154,10 +156,10 @@ class _MainScreenState extends State<MainScreen> {
                   child: Container(
                     height: MediaQuery.of(context).size.height, // 화면 전체 높이
                     color: Colors.white,
-                    child: const WebViewExample(),
+                    child: WebViewExample(linkUrl: dataList[_clickedMarkerId][1])),
+                    // child: Center(child: Text(dataList[_clickedMarkerId][0]),),
                   ),
                 ),
-              ),
             ],
           ),
         ),
