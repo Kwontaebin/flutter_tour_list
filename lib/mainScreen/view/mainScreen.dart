@@ -5,6 +5,7 @@ import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/function/sizeFn.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:provider/provider.dart';
+import '../../common/component/webview.dart';
 import '../../searchScreen/view/search.dart';
 
 class MainScreen extends StatefulWidget {
@@ -18,7 +19,18 @@ class _MainScreenState extends State<MainScreen> {
   final Completer<NaverMapController> mapControllerCompleter = Completer();
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
-  double _bottomSheetHeight = -300; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
+  double _bottomSheetHeight = 0.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
+
+  @override
+  void initState() {
+    super.initState();
+    // 초기 바텀 시트 위치를 화면 아래로 설정
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _bottomSheetHeight = -MediaQuery.of(context).size.height;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +112,8 @@ class _MainScreenState extends State<MainScreen> {
                           consumeSymbolTapEvents: false,
                           initialCameraPosition: NCameraPosition(
                             target: NLatLng(
-                              double.parse(dataList[int.parse(tappedMarker.info.id)][3][0]),
-                              double.parse(dataList[int.parse(tappedMarker.info.id)][3][1]),
+                              double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
+                              double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
                             ),
                             zoom: 15,
                             bearing: 0,
@@ -111,8 +123,8 @@ class _MainScreenState extends State<MainScreen> {
                       });
                       _setBound(
                         NLatLng(
-                          double.parse(dataList[int.parse(tappedMarker.info.id)][3][0]),
-                          double.parse(dataList[int.parse(tappedMarker.info.id)][3][1]),
+                          double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
+                          double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
                         ),
                       );
                     });
@@ -136,32 +148,21 @@ class _MainScreenState extends State<MainScreen> {
                 duration: const Duration(milliseconds: 300),
                 child: GestureDetector(
                   onVerticalDragUpdate: (details) {
-                    // 드래그하여 위젯 숨기기
-                    if (details.primaryDelta! < 0) {
-                      setState(() {
+                    setState(() {
+                      // 위로 드래그하여 열기
+                      if (details.primaryDelta! < 0) {
                         _bottomSheetHeight = 0.0;
-                      });
-                    } else if (details.primaryDelta! > 0) {
-                      setState(() {
-                        _bottomSheetHeight = -300.0; // 아래로 밀어 숨김
-                      });
-                    }
+                      }
+                      // 아래로 드래그하여 닫기
+                      else if (details.primaryDelta! > 0) {
+                        _bottomSheetHeight = -MediaQuery.of(context).size.height;
+                      }
+                    });
                   },
                   child: Container(
-                    height: 300,
+                    height: MediaQuery.of(context).size.height, // 화면 전체 높이
                     color: Colors.white,
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: const Text("상세 정보"),
-                          subtitle: Text(
-                            previousMarker != null
-                                ? '위치: ${dataList[int.parse(previousMarker!.info.id)][0]}'
-                                : '위치: 선택된 마커 없음',
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: const WebViewExample(),
                   ),
                 ),
               ),
