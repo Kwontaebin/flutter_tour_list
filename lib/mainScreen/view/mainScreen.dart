@@ -39,17 +39,38 @@ class _MainScreenState extends State<MainScreen> {
           child: Stack(
             children: [
               NaverMap(
+                onMapTapped: (point, latLng) {
+                  print("${latLng.latitude}, ${latLng.longitude}");
+
+                  setState(() {
+                    final newLatLng = NLatLng(latLng.latitude, latLng.longitude);
+                    mapList.add(newLatLng);
+
+                    // // Add a marker for the new location
+                    // final newMarker = NMarker(
+                    //   id: 'location $num',
+                    //   position: newLatLng,
+                    // );
+                    // _mapController?.addOverlay(newMarker);
+                    //
+                    // print(mapList);
+
+                    // 명동 남대문로 81 롯데백화점
+                  });
+                },
+
                 onMapReady: (controller) {
                   _mapController = controller;
                   mapControllerCompleter.complete(controller);
                   log("onMapReady", name: "onMapReady");
+                  print(dataList);
 
                   for (int i = 0; i < dataList.length; i++) {
                     marker = NMarker(
                       id: i.toString(),
                       position: NLatLng(
-                        double.parse(dataList[i][3][0]),
-                        double.parse(dataList[i][3][1]),
+                        double.parse(dataList[i][2][0]),
+                        double.parse(dataList[i][2][1]),
                       ),
                       size: const Size(40, 50),
                     );

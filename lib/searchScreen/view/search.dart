@@ -97,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
       postData: requestData,
       url: "search",
       onData: (Map<String, dynamic> data) async {
-        if(data["statusCode"] == 200) {
+        if (data["statusCode"] == 200) {
           setState(() {
             responseData = data["data"][0];
           });
@@ -116,11 +116,24 @@ class _SearchScreenState extends State<SearchScreen> {
             '_type': 'JSON',
           };
 
-          Response response = await dio.get(url, queryParameters: queryParameters);
+          Response response =
+              await dio.get(url, queryParameters: queryParameters);
 
-          for (int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
+          for (int i = 0;
+              i < response.data['response']["body"]["numOfRows"];
+              i++) {
             final item = response.data["response"]["body"]["items"]["item"][i];
             final result = await _geocodingService.fetchCoordinates(item["rlteBsicAdres"]);
+
+            final searchValue = await dio.get(
+              "https://openapi.naver.com/v1/search/local.json?query=${item['rlteSignguNm']}${item["rlteTatsNm"]}&display=1&start=1&sort=random",
+              options: Options(
+                headers: {
+                  'X-Naver-Client-Id': NAVER_SEARCH_ID,
+                  'X-Naver-Client-Secret': NAVER_SEARCH_SECRET,
+                },
+              ),
+            );
 
             setState(() {
               _latitude = result['latitude'].toString();
@@ -128,16 +141,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
               dataList.add([
                 item["rlteTatsNm"],
-                item["rlteBsicAdres"],
-                item["rlteCtgryMclsNm"],
+                searchValue.data["items"][0]["link"],
                 [_latitude, _longitude]
               ]);
               context.read<DataProvider>().setDataList(dataList);
             });
           }
-          print(context.read<DataProvider>().dataList.length);
 
-          if(context.read<DataProvider>().dataList.isNotEmpty) {
+          if (context.read<DataProvider>().dataList.isNotEmpty) {
             navigatorFn(context, const MainScreen());
           }
         }
@@ -148,15 +159,16 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> getLocationInfo(double latitude, double longitude) async {
     Dio dio = Dio();
 
-    final url = 'https://naveropenapi.apis.naver.com/map-reversegeocode/v2/gc?coords=$longitude,$latitude&orders=legalcode&output=json';
+    final url =
+        'https://naveropenapi.apis.naver.com/map-reversegeocode/v2/gc?coords=$longitude,$latitude&orders=legalcode&output=json';
 
     try {
       final response = await dio.get(
         url,
         options: Options(
           headers: {
-            'X-Naver-Client-Id': NAVER_MAP_KEY,  // 네이버 클라이언트 ID
-            'X-Naver-Client-Secret': NAVER_MAP_SECRET_KEY,  // 네이버 클라이언트 시크릿
+            'X-Naver-Client-Id': NAVER_MAP_KEY, // 네이버 클라이언트 ID
+            'X-Naver-Client-Secret': NAVER_MAP_SECRET_KEY, // 네이버 클라이언트 시크릿
           },
         ),
       );
