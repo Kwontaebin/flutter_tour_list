@@ -5,7 +5,6 @@ import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/function/sizeFn.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:provider/provider.dart';
-import '../../common/component/webview.dart';
 import '../../searchScreen/view/search.dart';
 
 class MainScreen extends StatefulWidget {
@@ -19,19 +18,9 @@ class _MainScreenState extends State<MainScreen> {
   final Completer<NaverMapController> mapControllerCompleter = Completer();
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
-  double _bottomSheetHeight = 0.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
+  double? _bottomSheetHeight = -300.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
   int _clickedMarkerId = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    // 초기 바텀 시트 위치를 화면 아래로 설정
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _bottomSheetHeight = -MediaQuery.of(context).size.height;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,17 +41,9 @@ class _MainScreenState extends State<MainScreen> {
         child: Stack(
           children: [
             NaverMap(
-              options: const NaverMapViewOptions(
-                mapType: NMapType.hybrid
-              ),
-
+              options: const NaverMapViewOptions(mapType: NMapType.hybrid),
               onMapTapped: (point, latLng) {
                 print("${latLng.latitude}, ${latLng.longitude}");
-
-                setState(() {
-                  final newLatLng = NLatLng(latLng.latitude, latLng.longitude);
-                  mapList.add(newLatLng);
-                });
               },
               onMapReady: (controller) {
                 _mapController = controller;
@@ -148,7 +129,7 @@ class _MainScreenState extends State<MainScreen> {
               bottom: _bottomSheetHeight,
               left: 0,
               right: 0,
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 500),
               child: GestureDetector(
                 onVerticalDragUpdate: (details) {
                   setState(() {
@@ -158,16 +139,17 @@ class _MainScreenState extends State<MainScreen> {
                     }
                     // 아래로 드래그하여 닫기
                     else if (details.primaryDelta! > 0) {
-                      _bottomSheetHeight = -MediaQuery.of(context).size.height;
+                      _bottomSheetHeight = -MediaQuery.of(context).size.height * 0.3;
                     }
                   });
                 },
                 child: Container(
-                  height: MediaQuery.of(context).size.height, // 화면 전체 높이
+                  height: MediaQuery.of(context).size.height * 0.3, // 화면 높이의 30%
                   color: Colors.white,
-                  child: dataList[_clickedMarkerId][1] == ""
-                      ? const Center(child: Text("정보가 없습니다."))
-                      : WebViewExample(linkUrl: dataList[_clickedMarkerId][1]),
+                  child: const Center(child: Text("정보가 없습니다.")),
+                  // child: dataList[_clickedMarkerId][1] == ""
+                  //     ? const Center(child: Text("정보가 없습니다."))
+                  //     : WebViewExample(linkUrl: dataList[_clickedMarkerId][1]),
                 ),
               ),
             ),
