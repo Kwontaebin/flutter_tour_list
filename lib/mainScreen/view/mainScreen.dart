@@ -21,7 +21,6 @@ class _MainScreenState extends State<MainScreen> {
   double? _bottomSheetHeight = -300.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
   int _clickedMarkerId = 0;
 
-
   @override
   Widget build(BuildContext context) {
     List dataList = context.read<DataProvider>().dataList;
@@ -42,9 +41,11 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             NaverMap(
               options: const NaverMapViewOptions(mapType: NMapType.hybrid),
+
               onMapTapped: (point, latLng) {
                 print("${latLng.latitude}, ${latLng.longitude}");
               },
+
               onMapReady: (controller) {
                 _mapController = controller;
                 mapControllerCompleter.complete(controller);
@@ -80,8 +81,6 @@ class _MainScreenState extends State<MainScreen> {
                       // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
                       _bottomSheetHeight = 0.0;
 
-                      print("marker id: ${tappedMarker.info.id}");
-
                       _clickedMarkerId = int.parse(tappedMarker.info.id);
 
                       NaverMapViewOptions(
@@ -90,12 +89,8 @@ class _MainScreenState extends State<MainScreen> {
                         consumeSymbolTapEvents: false,
                         initialCameraPosition: NCameraPosition(
                           target: NLatLng(
-                            double.parse(
-                                dataList[int.parse(tappedMarker.info.id)][2]
-                                    [0]),
-                            double.parse(
-                                dataList[int.parse(tappedMarker.info.id)][2]
-                                    [1]),
+                            double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
+                            double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
                           ),
                           zoom: 15,
                           bearing: 0,
@@ -105,10 +100,8 @@ class _MainScreenState extends State<MainScreen> {
                     });
                     _setBound(
                       NLatLng(
-                        double.parse(
-                            dataList[int.parse(tappedMarker.info.id)][2][0]),
-                        double.parse(
-                            dataList[int.parse(tappedMarker.info.id)][2][1]),
+                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
+                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
                       ),
                     );
                   });
@@ -133,14 +126,8 @@ class _MainScreenState extends State<MainScreen> {
               child: GestureDetector(
                 onVerticalDragUpdate: (details) {
                   setState(() {
-                    // 위로 드래그하여 열기
-                    if (details.primaryDelta! < 0) {
-                      _bottomSheetHeight = 0.0;
-                    }
-                    // 아래로 드래그하여 닫기
-                    else if (details.primaryDelta! > 0) {
-                      _bottomSheetHeight = -MediaQuery.of(context).size.height * 0.3;
-                    }
+                    // 위로 드래그하여 열기, 아래로 드래그하여 닫기
+                    details.primaryDelta! < 0 ? _bottomSheetHeight = 0.0 : _bottomSheetHeight = -MediaQuery.of(context).size.height * 0.3;
                   });
                 },
                 child: Container(
