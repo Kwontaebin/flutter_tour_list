@@ -42,8 +42,13 @@ class _MainScreenState extends State<MainScreen> {
             NaverMap(
               options: const NaverMapViewOptions(mapType: NMapType.hybrid),
 
-              onMapTapped: (point, latLng) {
-                print("${latLng.latitude}, ${latLng.longitude}");
+              onSymbolTapped: (symbol) {
+                print(symbol.caption);
+                print(symbol.position);
+
+                // setState(() {
+                //   _selectedPoiInfo = 'ID: ${symbol.id}, 이름: ${symbol.caption}';
+                // });
               },
 
               onMapReady: (controller) {
