@@ -40,136 +40,144 @@ class _MainScreenState extends State<MainScreen> {
     NMarker marker;
 
     return Scaffold(
-        appBar: const CustomAppBar(
-          title: "서울 구경",
-          bgColor: Colors.white,
-          showLeading: true,
-        ),
-        body: Container(
-          width: double.infinity,
-          height: deviceHeight(context),
-          color: Colors.white,
-          child: Stack(
-            children: [
-              NaverMap(
-                onMapTapped: (point, latLng) {
-                  print("${latLng.latitude}, ${latLng.longitude}");
+      appBar: const CustomAppBar(
+        title: "서울 구경",
+        bgColor: Colors.white,
+        showLeading: true,
+      ),
+      body: Container(
+        width: double.infinity,
+        height: deviceHeight(context),
+        color: Colors.white,
+        child: Stack(
+          children: [
+            NaverMap(
+              onMapTapped: (point, latLng) {
+                print("${latLng.latitude}, ${latLng.longitude}");
+
+                setState(() {
+                  final newLatLng = NLatLng(latLng.latitude, latLng.longitude);
+                  mapList.add(newLatLng);
+                });
+              },
+              onMapReady: (controller) {
+                _mapController = controller;
+                mapControllerCompleter.complete(controller);
+                log("onMapReady", name: "onMapReady");
+                print(dataList);
+
+                for (int i = 0; i < dataList.length; i++) {
+                  marker = NMarker(
+                    id: i.toString(),
+                    position: NLatLng(
+                      double.parse(dataList[i][2][0]),
+                      double.parse(dataList[i][2][1]),
+                    ),
+                    size: const Size(40, 50),
+                  );
 
                   setState(() {
-                    final newLatLng = NLatLng(latLng.latitude, latLng.longitude);
-                    mapList.add(newLatLng);
+                    if (mounted) {
+                      mapList.add(marker.position);
+                      print(marker);
+                      controller.addOverlay(marker);
+                    }
                   });
-                },
 
-                onMapReady: (controller) {
-                  _mapController = controller;
-                  mapControllerCompleter.complete(controller);
-                  log("onMapReady", name: "onMapReady");
-                  print(dataList);
-
-                  for (int i = 0; i < dataList.length; i++) {
-                    marker = NMarker(
-                      id: i.toString(),
-                      position: NLatLng(
-                        double.parse(dataList[i][2][0]),
-                        double.parse(dataList[i][2][1]),
-                      ),
-                      size: const Size(40, 50),
-                    );
-
+                  marker.setOnTapListener((NMarker tappedMarker) {
                     setState(() {
-                      if(mounted) {
-                        mapList.add(marker.position);
-                        print(marker);
-                        controller.addOverlay(marker);
+                      if (previousMarker != null && mounted) {
+                        previousMarker!.setIconTintColor(Colors.transparent);
                       }
-                    });
+                      tappedMarker.setIconTintColor(Colors.blue);
+                      previousMarker = tappedMarker;
 
-                    marker.setOnTapListener((NMarker tappedMarker) {
-                      setState(() {
-                        if (previousMarker != null && mounted) {
-                          previousMarker!.setIconTintColor(Colors.transparent);
-                        }
-                        tappedMarker.setIconTintColor(Colors.blue);
-                        previousMarker = tappedMarker;
+                      // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
+                      _bottomSheetHeight = 0.0;
 
-                        // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
-                        _bottomSheetHeight = 0.0;
+                      print("marker id: ${tappedMarker.info.id}");
 
-                        print("marker id: ${tappedMarker.info.id}");
+                      _clickedMarkerId = int.parse(tappedMarker.info.id);
 
-                        _clickedMarkerId = int.parse(tappedMarker.info.id);
-
-                        NaverMapViewOptions(
-                          indoorEnable: true,
-                          locationButtonEnable: false,
-                          consumeSymbolTapEvents: false,
-                          initialCameraPosition: NCameraPosition(
-                            target: NLatLng(
-                              double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
-                              double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
-                            ),
-                            zoom: 15,
-                            bearing: 0,
-                            tilt: 30,
+                      NaverMapViewOptions(
+                        indoorEnable: true,
+                        locationButtonEnable: false,
+                        consumeSymbolTapEvents: false,
+                        initialCameraPosition: NCameraPosition(
+                          target: NLatLng(
+                            double.parse(
+                                dataList[int.parse(tappedMarker.info.id)][2]
+                                    [0]),
+                            double.parse(
+                                dataList[int.parse(tappedMarker.info.id)][2]
+                                    [1]),
                           ),
-                        );
-                      });
-                      _setBound(
-                        NLatLng(
-                          double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
-                          double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
+                          zoom: 15,
+                          bearing: 0,
+                          tilt: 30,
                         ),
                       );
                     });
-
-                    final onMarkerInfoMap = NInfoWindow.onMarker(
-                      id: i.toString(),
-                      text: dataList[i][0],
+                    _setBound(
+                      NLatLng(
+                        double.parse(
+                            dataList[int.parse(tappedMarker.info.id)][2][0]),
+                        double.parse(
+                            dataList[int.parse(tappedMarker.info.id)][2][1]),
+                      ),
                     );
+                  });
 
-                    marker.openInfoWindow(onMarkerInfoMap);
-                  }
+                  final onMarkerInfoMap = NInfoWindow.onMarker(
+                    id: i.toString(),
+                    text: dataList[i][0],
+                  );
 
-                  _setBoundList(mapList);
+                  marker.openInfoWindow(onMarkerInfoMap);
+                }
+
+                _setBoundList(mapList);
+              },
+            ),
+            // 하단 슬라이드 가능한 위젯
+            AnimatedPositioned(
+              bottom: _bottomSheetHeight,
+              left: 0,
+              right: 0,
+              duration: const Duration(milliseconds: 300),
+              child: GestureDetector(
+                onVerticalDragUpdate: (details) {
+                  setState(() {
+                    // 위로 드래그하여 열기
+                    if (details.primaryDelta! < 0) {
+                      _bottomSheetHeight = 0.0;
+                    }
+                    // 아래로 드래그하여 닫기
+                    else if (details.primaryDelta! > 0) {
+                      _bottomSheetHeight = -MediaQuery.of(context).size.height;
+                    }
+                  });
                 },
-              ),
-              // 하단 슬라이드 가능한 위젯
-              AnimatedPositioned(
-                bottom: _bottomSheetHeight,
-                left: 0,
-                right: 0,
-                duration: const Duration(milliseconds: 300),
-                child: GestureDetector(
-                  onVerticalDragUpdate: (details) {
-                    setState(() {
-                      // 위로 드래그하여 열기
-                      if (details.primaryDelta! < 0) {
-                        _bottomSheetHeight = 0.0;
-                      }
-                      // 아래로 드래그하여 닫기
-                      else if (details.primaryDelta! > 0) {
-                        _bottomSheetHeight = -MediaQuery.of(context).size.height;
-                      }
-                    });
-                  },
-                  child: Container(
-                    height: MediaQuery.of(context).size.height, // 화면 전체 높이
-                    color: Colors.white,
-                    child: WebViewExample(linkUrl: dataList[_clickedMarkerId][1])),
-                    // child: Center(child: Text(dataList[_clickedMarkerId][0]),),
-                  ),
+                child: Container(
+                  height: MediaQuery.of(context).size.height, // 화면 전체 높이
+                  color: Colors.white,
+                  child: dataList[_clickedMarkerId][1] == ""
+                      ? const Center(child: Text("정보가 없습니다."))
+                      : WebViewExample(linkUrl: dataList[_clickedMarkerId][1]),
                 ),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
+      ),
     );
   }
 
   void _setBoundList(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
     print(positions);
-    NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
+    NCameraUpdate newCamera =
+        NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     _mapController?.updateCamera(newCamera);
   }
 
@@ -178,8 +186,10 @@ class _MainScreenState extends State<MainScreen> {
     const double offset = 0.005;
 
     NLatLngBounds bounds = NLatLngBounds(
-      southWest: NLatLng(position.latitude - offset, position.longitude - offset),
-      northEast: NLatLng(position.latitude + offset, position.longitude + offset),
+      southWest:
+          NLatLng(position.latitude - offset, position.longitude - offset),
+      northEast:
+          NLatLng(position.latitude + offset, position.longitude + offset),
     );
 
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(

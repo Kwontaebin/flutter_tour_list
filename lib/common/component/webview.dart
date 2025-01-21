@@ -21,7 +21,17 @@ class _WebViewExampleState extends State<WebViewExample> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted) // JavaScript 활성화
-      ..loadRequest(Uri.parse(widget.linkUrl)); // 원하는 URL 로드
+      ..loadRequest(Uri.parse(widget.linkUrl)); // 초기 URL 로드
+  }
+
+  @override
+  void didUpdateWidget(covariant WebViewExample oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.linkUrl != widget.linkUrl) {
+      // URL이 변경되었을 때 새로운 URL 로드
+      _controller.loadRequest(Uri.parse(widget.linkUrl));
+      print(widget.linkUrl);
+    }
   }
 
   @override
