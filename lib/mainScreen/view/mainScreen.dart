@@ -52,6 +52,10 @@ class _MainScreenState extends State<MainScreen> {
         child: Stack(
           children: [
             NaverMap(
+              options: const NaverMapViewOptions(
+                mapType: NMapType.hybrid
+              ),
+
               onMapTapped: (point, latLng) {
                 print("${latLng.latitude}, ${latLng.longitude}");
 
