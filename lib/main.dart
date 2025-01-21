@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/searchScreen/view/search.dart';
-import 'package:flutter_tour_list/splashScreen/view/splash.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {

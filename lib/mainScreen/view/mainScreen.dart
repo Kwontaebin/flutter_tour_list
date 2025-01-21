@@ -45,10 +45,6 @@ class _MainScreenState extends State<MainScreen> {
               onSymbolTapped: (symbol) {
                 print(symbol.caption);
                 print(symbol.position);
-
-                // setState(() {
-                //   _selectedPoiInfo = 'ID: ${symbol.id}, 이름: ${symbol.caption}';
-                // });
               },
 
               onMapReady: (controller) {
@@ -154,8 +150,7 @@ class _MainScreenState extends State<MainScreen> {
   void _setBoundList(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
     print(positions);
-    NCameraUpdate newCamera =
-        NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
+    NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     _mapController?.updateCamera(newCamera);
   }
 
@@ -164,10 +159,8 @@ class _MainScreenState extends State<MainScreen> {
     const double offset = 0.005;
 
     NLatLngBounds bounds = NLatLngBounds(
-      southWest:
-          NLatLng(position.latitude - offset, position.longitude - offset),
-      northEast:
-          NLatLng(position.latitude + offset, position.longitude + offset),
+      southWest: NLatLng(position.latitude - offset, position.longitude - offset),
+      northEast: NLatLng(position.latitude + offset, position.longitude + offset),
     );
 
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(
