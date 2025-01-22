@@ -41,16 +41,17 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             NaverMap(
               options: const NaverMapViewOptions(mapType: NMapType.hybrid),
-
               onSymbolTapped: (symbol) {
                 print(symbol.caption);
                 print(symbol.position);
 
                 setState(() {
-                  _bottomSheetHeight = 0.0;
+                  markerZoom(
+                    symbol.position.latitude,
+                    symbol.position.longitude,
+                  );
                 });
               },
-
               onMapReady: (controller) {
                 _mapController = controller;
                 mapControllerCompleter.complete(controller);
@@ -77,14 +78,9 @@ class _MainScreenState extends State<MainScreen> {
 
                   marker.setOnTapListener((NMarker tappedMarker) {
                     setState(() {
-                      if (previousMarker != null && mounted) {
-                        previousMarker!.setIconTintColor(Colors.transparent);
-                      }
+                      if (previousMarker != null && mounted) previousMarker!.setIconTintColor(Colors.transparent);
                       tappedMarker.setIconTintColor(Colors.blue);
                       previousMarker = tappedMarker;
-
-                      // 마커 클릭 시 하단 위젯을 슬라이드하여 보이게 함
-                      _bottomSheetHeight = 0.0;
 
                       _clickedMarkerId = int.parse(tappedMarker.info.id);
 
@@ -93,12 +89,6 @@ class _MainScreenState extends State<MainScreen> {
                         double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
                       );
                     });
-                    _setBound(
-                      NLatLng(
-                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
-                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
-                      ),
-                    );
                   });
 
                   final onMarkerInfoMap = NInfoWindow.onMarker(
@@ -122,11 +112,15 @@ class _MainScreenState extends State<MainScreen> {
                 onVerticalDragUpdate: (details) {
                   setState(() {
                     // 위로 드래그하여 열기, 아래로 드래그하여 닫기
-                    details.primaryDelta! < 0 ? _bottomSheetHeight = 0.0 : _bottomSheetHeight = -MediaQuery.of(context).size.height * 0.3;
+                    details.primaryDelta! < 0
+                        ? _bottomSheetHeight = 0.0
+                        : _bottomSheetHeight =
+                            -MediaQuery.of(context).size.height * 0.3;
                   });
                 },
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.3, // 화면 높이의 30%
+                  height:
+                      MediaQuery.of(context).size.height * 0.3, // 화면 높이의 30%
                   color: Colors.white,
                   child: const Center(child: Text("정보가 없습니다.")),
                   // child: dataList[_clickedMarkerId][1] == ""
@@ -144,7 +138,8 @@ class _MainScreenState extends State<MainScreen> {
   void _setBoundList(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
     print(positions);
-    NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
+    NCameraUpdate newCamera =
+        NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     _mapController?.updateCamera(newCamera);
   }
 
@@ -153,8 +148,10 @@ class _MainScreenState extends State<MainScreen> {
     const double offset = 0.005;
 
     NLatLngBounds bounds = NLatLngBounds(
-      southWest: NLatLng(position.latitude - offset, position.longitude - offset),
-      northEast: NLatLng(position.latitude + offset, position.longitude + offset),
+      southWest:
+          NLatLng(position.latitude - offset, position.longitude - offset),
+      northEast:
+          NLatLng(position.latitude + offset, position.longitude + offset),
     );
 
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(
@@ -167,6 +164,8 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void markerZoom(double lat, double lon) {
+    _bottomSheetHeight = 0.0;
+
     NaverMapViewOptions(
       indoorEnable: true,
       locationButtonEnable: false,
@@ -177,6 +176,10 @@ class _MainScreenState extends State<MainScreen> {
         bearing: 0,
         tilt: 30,
       ),
+    );
+
+    _setBound(
+      NLatLng(lat, lon),
     );
   }
 }
