@@ -123,14 +123,15 @@ class _SearchScreenState extends State<SearchScreen> {
             final result = await _geocodingService.fetchCoordinates(item["rlteBsicAdres"]);
 
             final searchValue = await dio.get(
-              "https://openapi.naver.com/v1/search/local.json?query=${item['rlteSignguNm']}${item["rlteTatsNm"]}&display=1&start=1&sort=random",
+              "https://dapi.kakao.com/v2/local/search/keyword.JSON?x=${result['longitude'].toString()}&y=${result['latitude'].toString()}&query=${item["rlteTatsNm"]}&size=1",
               options: Options(
                 headers: {
-                  'X-Naver-Client-Id': NAVER_SEARCH_ID,
-                  'X-Naver-Client-Secret': NAVER_SEARCH_SECRET,
+                  "Authorization": KAKAO_SEARCH_KEY
                 },
               ),
             );
+
+            print(searchValue.data["documents"][0]["place_url"]);
 
             setState(() {
               _latitude = result['latitude'].toString();
@@ -138,7 +139,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
               dataList.add([
                 item["rlteTatsNm"],
-                searchValue.data["items"][0]["link"],
+                searchValue.data["documents"][0]["place_url"],
                 [_latitude, _longitude]
               ]);
               context.read<DataProvider>().setDataList(dataList);

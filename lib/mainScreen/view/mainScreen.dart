@@ -5,6 +5,7 @@ import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/function/sizeFn.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:provider/provider.dart';
+import '../../common/component/webview.dart';
 import '../../searchScreen/view/search.dart';
 
 class MainScreen extends StatefulWidget {
@@ -56,7 +57,6 @@ class _MainScreenState extends State<MainScreen> {
                 _mapController = controller;
                 mapControllerCompleter.complete(controller);
                 log("onMapReady", name: "onMapReady");
-                print(dataList);
 
                 for (int i = 0; i < dataList.length; i++) {
                   marker = NMarker(
@@ -83,6 +83,8 @@ class _MainScreenState extends State<MainScreen> {
                       previousMarker = tappedMarker;
 
                       _clickedMarkerId = int.parse(tappedMarker.info.id);
+
+                      print("dataList ${dataList[int.parse(tappedMarker.info.id)]}");
 
                       markerZoom(
                         double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
@@ -114,18 +116,15 @@ class _MainScreenState extends State<MainScreen> {
                     // 위로 드래그하여 열기, 아래로 드래그하여 닫기
                     details.primaryDelta! < 0
                         ? _bottomSheetHeight = 0.0
-                        : _bottomSheetHeight =
-                            -MediaQuery.of(context).size.height * 0.3;
+                        : _bottomSheetHeight = -MediaQuery.of(context).size.height * 0.3;
                   });
                 },
                 child: Container(
-                  height:
-                      MediaQuery.of(context).size.height * 0.3, // 화면 높이의 30%
+                  height: MediaQuery.of(context).size.height * 0.3, // 화면 높이의 30%
                   color: Colors.white,
-                  child: const Center(child: Text("정보가 없습니다.")),
-                  // child: dataList[_clickedMarkerId][1] == ""
-                  //     ? const Center(child: Text("정보가 없습니다."))
-                  //     : WebViewExample(linkUrl: dataList[_clickedMarkerId][1]),
+                  child: dataList[_clickedMarkerId][1] == ""
+                      ? const Center(child: Text("정보가 없습니다."))
+                      : WebViewExample(linkUrl: dataList[_clickedMarkerId][1]),
                 ),
               ),
             ),
@@ -137,9 +136,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void _setBoundList(List<NLatLng> positions) {
     NLatLngBounds bounds = NLatLngBounds.from(positions);
-    print(positions);
-    NCameraUpdate newCamera =
-        NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
+    NCameraUpdate newCamera = NCameraUpdate.fitBounds(bounds, padding: const EdgeInsets.all(100.0));
     _mapController?.updateCamera(newCamera);
   }
 
@@ -148,10 +145,8 @@ class _MainScreenState extends State<MainScreen> {
     const double offset = 0.005;
 
     NLatLngBounds bounds = NLatLngBounds(
-      southWest:
-          NLatLng(position.latitude - offset, position.longitude - offset),
-      northEast:
-          NLatLng(position.latitude + offset, position.longitude + offset),
+      southWest: NLatLng(position.latitude - offset, position.longitude - offset),
+      northEast: NLatLng(position.latitude + offset, position.longitude + offset),
     );
 
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(
@@ -159,7 +154,6 @@ class _MainScreenState extends State<MainScreen> {
       padding: const EdgeInsets.all(50.0), // 주변 여백 조정
     );
 
-    print("Updated bounds : $bounds");
     _mapController?.updateCamera(newCamera);
   }
 
