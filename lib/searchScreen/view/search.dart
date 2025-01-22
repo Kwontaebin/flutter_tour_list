@@ -116,12 +116,9 @@ class _SearchScreenState extends State<SearchScreen> {
             '_type': 'JSON',
           };
 
-          Response response =
-              await dio.get(url, queryParameters: queryParameters);
+          Response response = await dio.get(url, queryParameters: queryParameters);
 
-          for (int i = 0;
-              i < response.data['response']["body"]["numOfRows"];
-              i++) {
+          for (int i = 0; i < response.data['response']["body"]["numOfRows"]; i++) {
             final item = response.data["response"]["body"]["items"]["item"][i];
             final result = await _geocodingService.fetchCoordinates(item["rlteBsicAdres"]);
 

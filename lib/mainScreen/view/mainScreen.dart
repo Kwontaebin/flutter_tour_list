@@ -45,6 +45,10 @@ class _MainScreenState extends State<MainScreen> {
               onSymbolTapped: (symbol) {
                 print(symbol.caption);
                 print(symbol.position);
+
+                setState(() {
+                  _bottomSheetHeight = 0.0;
+                });
               },
 
               onMapReady: (controller) {
@@ -84,19 +88,9 @@ class _MainScreenState extends State<MainScreen> {
 
                       _clickedMarkerId = int.parse(tappedMarker.info.id);
 
-                      NaverMapViewOptions(
-                        indoorEnable: true,
-                        locationButtonEnable: false,
-                        consumeSymbolTapEvents: false,
-                        initialCameraPosition: NCameraPosition(
-                          target: NLatLng(
-                            double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
-                            double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
-                          ),
-                          zoom: 15,
-                          bearing: 0,
-                          tilt: 30,
-                        ),
+                      markerZoom(
+                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
+                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
                       );
                     });
                     _setBound(
@@ -170,5 +164,19 @@ class _MainScreenState extends State<MainScreen> {
 
     print("Updated bounds : $bounds");
     _mapController?.updateCamera(newCamera);
+  }
+
+  void markerZoom(double lat, double lon) {
+    NaverMapViewOptions(
+      indoorEnable: true,
+      locationButtonEnable: false,
+      consumeSymbolTapEvents: false,
+      initialCameraPosition: NCameraPosition(
+        target: NLatLng(lat, lon),
+        zoom: 15,
+        bearing: 0,
+        tilt: 30,
+      ),
+    );
   }
 }
