@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
 import 'package:flutter_tour_list/common/function/sizeFn.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:provider/provider.dart';
 import '../../common/component/webview.dart';
+import '../../common/const/data.dart';
 import '../../searchScreen/view/search.dart';
 
 class MainScreen extends StatefulWidget {
@@ -19,8 +21,10 @@ class _MainScreenState extends State<MainScreen> {
   final Completer<NaverMapController> mapControllerCompleter = Completer();
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
-  double? _bottomSheetHeight = -1000.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
+  double? _bottomSheetHeight = -1000.0;
   int _clickedMarkerId = 0;
+  String _urlLink = "";
+  Future<String>? _urlLinkFuture;
 
   @override
   Widget build(BuildContext context) {
@@ -42,28 +46,44 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             NaverMap(
               options: const NaverMapViewOptions(mapType: NMapType.hybrid),
-              onSymbolTapped: (symbol) {
+              onSymbolTapped: (symbol) async {
                 print(symbol.caption);
                 print(symbol.position);
 
                 setState(() {
-                  markerZoom(
+                  _urlLinkFuture = getLocationInformation(
                     symbol.position.latitude,
                     symbol.position.longitude,
+                    symbol.caption,
                   );
                 });
+
+                try {
+                  _urlLink = await _urlLinkFuture!;
+                  setState(() {});
+                  print("Updated _urlLink value: $_urlLink");
+                } catch (e) {
+                  print("Error fetching URL: $e");
+                }
+
+                markerZoom(
+                  symbol.position.latitude,
+                  symbol.position.longitude,
+                );
               },
               onMapReady: (controller) {
                 _mapController = controller;
                 mapControllerCompleter.complete(controller);
                 log("onMapReady", name: "onMapReady");
 
+                print(dataList);
+
                 for (int i = 0; i < dataList.length; i++) {
                   marker = NMarker(
                     id: i.toString(),
                     position: NLatLng(
-                      double.parse(dataList[i][2][0]),
-                      double.parse(dataList[i][2][1]),
+                      double.parse(dataList[i][1][0]),
+                      double.parse(dataList[i][1][1]),
                     ),
                     size: const Size(40, 50),
                   );
@@ -76,21 +96,36 @@ class _MainScreenState extends State<MainScreen> {
                     }
                   });
 
-                  marker.setOnTapListener((NMarker tappedMarker) {
+                  marker.setOnTapListener((NMarker tappedMarker) async {
+                    print("data information ${dataList[int.parse(tappedMarker.info.id)][0]}");
+
                     setState(() {
-                      if (previousMarker != null && mounted) previousMarker!.setIconTintColor(Colors.transparent);
+                      if (previousMarker != null && mounted) {
+                        previousMarker!.setIconTintColor(Colors.transparent);
+                      }
                       tappedMarker.setIconTintColor(Colors.blue);
                       previousMarker = tappedMarker;
-
                       _clickedMarkerId = int.parse(tappedMarker.info.id);
 
-                      print("dataList ${dataList[int.parse(tappedMarker.info.id)]}");
-
-                      markerZoom(
-                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][0]),
-                        double.parse(dataList[int.parse(tappedMarker.info.id)][2][1]),
+                      _urlLinkFuture = getLocationInformation(
+                        double.parse(dataList[_clickedMarkerId][1][0]),
+                        double.parse(dataList[_clickedMarkerId][1][1]),
+                        dataList[_clickedMarkerId][0],
                       );
                     });
+
+                    try {
+                      _urlLink = await _urlLinkFuture!;
+                      setState(() {});
+                      print("Updated _urlLink value: $_urlLink");
+                    } catch (e) {
+                      print("Error fetching URL: $e");
+                    }
+
+                    markerZoom(
+                      double.parse(dataList[_clickedMarkerId][1][0]),
+                      double.parse(dataList[_clickedMarkerId][1][1]),
+                    );
                   });
 
                   final onMarkerInfoMap = NInfoWindow.onMarker(
@@ -104,7 +139,6 @@ class _MainScreenState extends State<MainScreen> {
                 _setBoundList(mapList);
               },
             ),
-            // 하단 슬라이드 가능한 위젯
             AnimatedPositioned(
               bottom: _bottomSheetHeight,
               left: 0,
@@ -113,19 +147,16 @@ class _MainScreenState extends State<MainScreen> {
               child: GestureDetector(
                 onVerticalDragUpdate: (details) {
                   setState(() {
-                    // 위로 드래그하여 열기, 아래로 드래그하여 닫기
                     details.primaryDelta! < 0
                         ? _bottomSheetHeight = 0.0
                         : _bottomSheetHeight = -MediaQuery.of(context).size.height * 1.0;
                   });
                 },
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 1.0, // 화면 높이의 30%
-                  color: Colors.white,
-                  child: dataList[_clickedMarkerId][1] == ""
-                      ? const Center(child: Text("정보가 없습니다."))
-                      : WebViewExample(linkUrl: dataList[_clickedMarkerId][1]),
-                ),
+                    height: MediaQuery.of(context).size.height * 1.0,
+                    color: Colors.white,
+                    child:
+                        _urlLink == "" ? const Center(child: Text("마커를 선택해주세요")) : WebViewExample(linkUrl: _urlLink)),
               ),
             ),
           ],
@@ -141,7 +172,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _setBound(NLatLng position) {
-    // 여유를 줄 거리(단위: 위도/경도 약 0.001 ~ 0.01 범위에서 적절히 설정)
     const double offset = 0.005;
 
     NLatLngBounds bounds = NLatLngBounds(
@@ -151,7 +181,7 @@ class _MainScreenState extends State<MainScreen> {
 
     NCameraUpdate newCamera = NCameraUpdate.fitBounds(
       bounds,
-      padding: const EdgeInsets.all(50.0), // 주변 여백 조정
+      padding: const EdgeInsets.all(50.0),
     );
 
     _mapController?.updateCamera(newCamera);
@@ -175,5 +205,20 @@ class _MainScreenState extends State<MainScreen> {
     _setBound(
       NLatLng(lat, lon),
     );
+  }
+
+  Future<String> getLocationInformation(double lat, double lon, String name) async {
+    var dio = Dio();
+
+    final searchValue = await dio.get(
+      "https://dapi.kakao.com/v2/local/search/keyword.JSON?x=$lon&y=$lat&query=$name&size=1",
+      options: Options(
+        headers: {"Authorization": KAKAO_SEARCH_KEY},
+      ),
+    );
+
+    String value = searchValue.data["documents"][0]["place_url"];
+
+    return value;
   }
 }

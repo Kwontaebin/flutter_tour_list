@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../function/sizeFn.dart';
+
 class WebViewExample extends StatefulWidget {
   final String linkUrl;
 
@@ -50,7 +52,7 @@ class _WebViewExampleState extends State<WebViewExample> {
     return Container(
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.only(top: 60),
+        padding: EdgeInsets.only(top: sizeFn(context).height * 0.075),
         child: SizedBox(
           height: double.infinity,
           child: WebViewWidget(controller: _controller),
