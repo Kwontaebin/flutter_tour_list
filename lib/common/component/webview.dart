@@ -20,8 +20,19 @@ class _WebViewExampleState extends State<WebViewExample> {
   void initState() {
     super.initState();
     _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted) // JavaScript 활성화
-      ..loadRequest(Uri.parse(widget.linkUrl)); // 초기 URL 로드
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent('Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36')
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onWebResourceError: (WebResourceError error) {
+            print('웹뷰 에러: ${error.description}');
+          },
+          onPageFinished: (String url) {
+            print('페이지 로딩 완료: $url');
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(widget.linkUrl));
   }
 
   @override

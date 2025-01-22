@@ -19,7 +19,7 @@ class _MainScreenState extends State<MainScreen> {
   final Completer<NaverMapController> mapControllerCompleter = Completer();
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
-  double? _bottomSheetHeight = -300.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
+  double? _bottomSheetHeight = -1000.0; // 슬라이드 바텀 시트 초기 위치 (숨겨짐)
   int _clickedMarkerId = 0;
 
   @override
@@ -116,11 +116,11 @@ class _MainScreenState extends State<MainScreen> {
                     // 위로 드래그하여 열기, 아래로 드래그하여 닫기
                     details.primaryDelta! < 0
                         ? _bottomSheetHeight = 0.0
-                        : _bottomSheetHeight = -MediaQuery.of(context).size.height * 0.3;
+                        : _bottomSheetHeight = -MediaQuery.of(context).size.height * 1.0;
                   });
                 },
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.3, // 화면 높이의 30%
+                  height: MediaQuery.of(context).size.height * 1.0, // 화면 높이의 30%
                   color: Colors.white,
                   child: dataList[_clickedMarkerId][1] == ""
                       ? const Center(child: Text("정보가 없습니다."))

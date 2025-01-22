@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tour_list/common/component/webview.dart';
 import 'package:flutter_tour_list/searchScreen/view/search.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +27,7 @@ class _MyAppState extends State<MyApp> {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'tourList',
+      // home: WebViewExample(linkUrl: "http://place.map.kakao.com/1913983226"),
       home: SearchScreen(),
     );
   }
