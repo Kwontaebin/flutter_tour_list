@@ -145,13 +145,14 @@ class _MainScreenState extends State<MainScreen> {
               right: 0,
               duration: const Duration(milliseconds: 500),
               child: GestureDetector(
-                onVerticalDragUpdate: (details) {
-                  setState(() {
-                    details.primaryDelta! < 0
-                        ? _bottomSheetHeight = 0.0
-                        : _bottomSheetHeight = -MediaQuery.of(context).size.height * 1.0;
-                  });
-                },
+                // onVerticalDragUpdate: (details) {
+                //   setState(() {
+                //     details.primaryDelta! < 0
+                //         ? _bottomSheetHeight = 0.0
+                //         : _bottomSheetHeight = double.infinity;
+                //         // : _bottomSheetHeight = -MediaQuery.of(context).size.height * 1.0;
+                //   });
+                // },
                 child: Container(
                   height: MediaQuery.of(context).size.height * 1.0,
                   color: Colors.white,
