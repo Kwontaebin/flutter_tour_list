@@ -155,7 +155,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: Container(
                   height: MediaQuery.of(context).size.height * 1.0,
                   color: Colors.white,
-                  child: _urlLink == "" ? const Center(child: Text("정보가 없습니다")) : WebViewExample(linkUrl: _urlLink),
+                  child: _urlLink.isEmpty ? const Center(child: Text("정보가 없습니다")) : WebViewExample(linkUrl: _urlLink),
                 ),
               ),
             ),
