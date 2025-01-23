@@ -51,12 +51,9 @@ class _WebViewExampleState extends State<WebViewExample> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.only(top: sizeFn(context).height * 0.075),
-        child: SizedBox(
-          height: double.infinity,
-          child: WebViewWidget(controller: _controller),
-        ),
+      child: SizedBox(
+        height: double.infinity,
+        child: WebViewWidget(controller: _controller),
       ),
     );
   }

@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/common/component/custom_appbar.dart';
+import 'package:flutter_tour_list/common/function/navigator.dart';
 import 'package:flutter_tour_list/common/function/sizeFn.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:flutter_tour_list/mainScreen/view/locationInformation.dart';
 import 'package:provider/provider.dart';
 import '../../common/component/webview.dart';
 import '../../common/const/data.dart';
@@ -70,6 +72,8 @@ class _MainScreenState extends State<MainScreen> {
                   symbol.position.latitude,
                   symbol.position.longitude,
                 );
+
+                navigatorFn(context, LocationInformationScreen(urlLink: _urlLink));
               },
               onMapReady: (controller) {
                 _mapController = controller;
@@ -126,6 +130,8 @@ class _MainScreenState extends State<MainScreen> {
                       double.parse(dataList[_clickedMarkerId][1][0]),
                       double.parse(dataList[_clickedMarkerId][1][1]),
                     );
+
+                    navigatorFn(context, LocationInformationScreen(urlLink: _urlLink));
                   });
 
                   final onMarkerInfoMap = NInfoWindow.onMarker(
@@ -139,27 +145,27 @@ class _MainScreenState extends State<MainScreen> {
                 _setBoundList(mapList);
               },
             ),
-            AnimatedPositioned(
-              bottom: _bottomSheetHeight,
-              left: 0,
-              right: 0,
-              duration: const Duration(milliseconds: 500),
-              child: GestureDetector(
-                // onVerticalDragUpdate: (details) {
-                //   setState(() {
-                //     details.primaryDelta! < 0
-                //         ? _bottomSheetHeight = 0.0
-                //         : _bottomSheetHeight = double.infinity;
-                //         // : _bottomSheetHeight = -MediaQuery.of(context).size.height * 1.0;
-                //   });
-                // },
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 1.0,
-                  color: Colors.white,
-                  child: _urlLink.isEmpty ? const Center(child: Text("정보가 없습니다")) : WebViewExample(linkUrl: _urlLink),
-                ),
-              ),
-            ),
+            // AnimatedPositioned(
+            //   bottom: _bottomSheetHeight,
+            //   left: 0,
+            //   right: 0,
+            //   duration: const Duration(milliseconds: 500),
+            //   child: GestureDetector(
+            //     // onVerticalDragUpdate: (details) {
+            //     //   setState(() {
+            //     //     details.primaryDelta! < 0
+            //     //         ? _bottomSheetHeight = 0.0
+            //     //         : _bottomSheetHeight = double.infinity;
+            //     //         // : _bottomSheetHeight = -MediaQuery.of(context).size.height * 1.0;
+            //     //   });
+            //     // },
+            //     child: Container(
+            //       height: MediaQuery.of(context).size.height * 1.0,
+            //       color: Colors.white,
+            //       child: _urlLink.isEmpty ? const Center(child: Text("정보가 없습니다")) : WebViewExample(linkUrl: _urlLink),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

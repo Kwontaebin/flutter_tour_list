@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tour_list/common/component/webview.dart';
+import 'package:flutter_tour_list/mainScreen/view/locationInformation.dart';
 import 'package:flutter_tour_list/searchScreen/view/search.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,7 @@ class _MyAppState extends State<MyApp> {
       title: 'tourList',
       // home: WebViewExample(linkUrl: "http://place.map.kakao.com/10652921"),
       home: SearchScreen(),
+      // home: LocationInformationScreen(urlLink: "http://place.map.kakao.com/10652921"),
     );
   }
 }
