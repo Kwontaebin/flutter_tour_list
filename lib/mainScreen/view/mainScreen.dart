@@ -23,7 +23,6 @@ class _MainScreenState extends State<MainScreen> {
   final Completer<NaverMapController> mapControllerCompleter = Completer();
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
-  double? _bottomSheetHeight = -1000.0;
   int _clickedMarkerId = 0;
   String _urlLink = "";
   Future<String>? _urlLinkFuture;
@@ -145,27 +144,6 @@ class _MainScreenState extends State<MainScreen> {
                 _setBoundList(mapList);
               },
             ),
-            // AnimatedPositioned(
-            //   bottom: _bottomSheetHeight,
-            //   left: 0,
-            //   right: 0,
-            //   duration: const Duration(milliseconds: 500),
-            //   child: GestureDetector(
-            //     // onVerticalDragUpdate: (details) {
-            //     //   setState(() {
-            //     //     details.primaryDelta! < 0
-            //     //         ? _bottomSheetHeight = 0.0
-            //     //         : _bottomSheetHeight = double.infinity;
-            //     //         // : _bottomSheetHeight = -MediaQuery.of(context).size.height * 1.0;
-            //     //   });
-            //     // },
-            //     child: Container(
-            //       height: MediaQuery.of(context).size.height * 1.0,
-            //       color: Colors.white,
-            //       child: _urlLink.isEmpty ? const Center(child: Text("정보가 없습니다")) : WebViewExample(linkUrl: _urlLink),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -195,7 +173,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void markerZoom(double lat, double lon) {
-    _bottomSheetHeight = 0.0;
 
     NaverMapViewOptions(
       indoorEnable: true,
