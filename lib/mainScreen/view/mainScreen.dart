@@ -77,7 +77,8 @@ class _MainScreenState extends State<MainScreen> {
               onMapReady: (controller) {
                 _mapController = controller;
                 mapControllerCompleter.complete(controller);
-                log("onMapReady", name: "onMapReady");
+
+                print("네이버 지도 준비 완료!!!");
 
                 print(dataList);
 
