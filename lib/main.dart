@@ -28,9 +28,7 @@ class _MyAppState extends State<MyApp> {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'tourList',
-      // home: WebViewExample(linkUrl: "http://place.map.kakao.com/10652921"),
       home: SearchScreen(),
-      // home: LocationInformationScreen(urlLink: "http://place.map.kakao.com/10652921"),
     );
   }
 }
