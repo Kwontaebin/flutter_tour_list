@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tour_list/common/function/navigator.dart';
-import 'package:flutter_tour_list/mainScreen/view/mainScreen.dart';
 import '../../common/component/webview.dart';
 
 class LocationInformationScreen extends StatefulWidget {
@@ -23,7 +21,7 @@ class _LocationInformationScreenState extends State<LocationInformationScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
-            navigatorFn(context, const MainScreen());
+            Navigator.pop(context);
           },
           icon: const Icon(
             Icons.keyboard_arrow_down_sharp,

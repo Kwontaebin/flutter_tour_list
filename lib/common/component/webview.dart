@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../function/sizeFn.dart';
+import '../../mainScreen/view/locationInformation.dart';
+import '../function/navigator.dart';
 
 class WebViewExample extends StatefulWidget {
   final String linkUrl;
@@ -17,13 +18,15 @@ class WebViewExample extends StatefulWidget {
 
 class _WebViewExampleState extends State<WebViewExample> {
   late final WebViewController _controller;
+  bool status = false;
 
   @override
   void initState() {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setUserAgent('Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36')
+      ..setUserAgent(
+          'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36')
       ..setNavigationDelegate(
         NavigationDelegate(
           onWebResourceError: (WebResourceError error) {
@@ -31,6 +34,10 @@ class _WebViewExampleState extends State<WebViewExample> {
           },
           onPageFinished: (String url) {
             print('페이지 로딩 완료: $url');
+
+            setState(() {
+              status = true;
+            });
           },
         ),
       )
@@ -53,7 +60,11 @@ class _WebViewExampleState extends State<WebViewExample> {
       color: Colors.white,
       child: SizedBox(
         height: double.infinity,
-        child: WebViewWidget(controller: _controller),
+        child: status
+            ? WebViewWidget(controller: _controller)
+            : const Center(
+                child: CircularProgressIndicator(),
+              ),
       ),
     );
   }
