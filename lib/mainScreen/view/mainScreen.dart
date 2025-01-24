@@ -33,10 +33,22 @@ class _MainScreenState extends State<MainScreen> {
     NMarker marker;
 
     return Scaffold(
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         title: "서울 구경",
         bgColor: Colors.white,
         showLeading: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.search,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Container(
         width: double.infinity,
@@ -178,12 +190,12 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> getUrlLink(double lat, double lon, String name) async {
     setState(() {
-      if(mounted) _urlLinkFuture = getLocationInformation(lat, lon, name);
+      if (mounted) _urlLinkFuture = getLocationInformation(lat, lon, name);
     });
 
     try {
       _urlLink = await _urlLinkFuture!;
-      setState(() {});
+      setState(() {}); // 값 변경 감지
       print("Updated _urlLink value: $_urlLink");
     } catch (e) {
       print("Error fetching URL: $e");
