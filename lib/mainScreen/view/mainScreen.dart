@@ -50,25 +50,10 @@ class _MainScreenState extends State<MainScreen> {
                 print(symbol.caption);
                 print(symbol.position);
 
-                setState(() {
-                  _urlLinkFuture = getLocationInformation(
-                    symbol.position.latitude,
-                    symbol.position.longitude,
-                    symbol.caption,
-                  );
-                });
-
-                try {
-                  _urlLink = await _urlLinkFuture!;
-                  setState(() {});
-                  print("Updated _urlLink value: $_urlLink");
-                } catch (e) {
-                  print("Error fetching URL: $e");
-                }
-
-                markerZoom(
+                await getUrlLink(
                   symbol.position.latitude,
                   symbol.position.longitude,
+                  symbol.caption,
                 );
 
                 navigatorFn(context, LocationInformationScreen(urlLink: _urlLink));
@@ -108,25 +93,12 @@ class _MainScreenState extends State<MainScreen> {
                       tappedMarker.setIconTintColor(Colors.blue);
                       previousMarker = tappedMarker;
                       _clickedMarkerId = int.parse(tappedMarker.info.id);
-
-                      _urlLinkFuture = getLocationInformation(
-                        double.parse(dataList[_clickedMarkerId][1][0]),
-                        double.parse(dataList[_clickedMarkerId][1][1]),
-                        dataList[_clickedMarkerId][0],
-                      );
                     });
 
-                    try {
-                      _urlLink = await _urlLinkFuture!;
-                      setState(() {});
-                      print("Updated _urlLink value: $_urlLink");
-                    } catch (e) {
-                      print("Error fetching URL: $e");
-                    }
-
-                    markerZoom(
+                    await getUrlLink(
                       double.parse(dataList[_clickedMarkerId][1][0]),
                       double.parse(dataList[_clickedMarkerId][1][1]),
+                      dataList[_clickedMarkerId][0],
                     );
 
                     navigatorFn(context, LocationInformationScreen(urlLink: _urlLink));
@@ -172,7 +144,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void markerZoom(double lat, double lon) {
-
     NaverMapViewOptions(
       indoorEnable: true,
       locationButtonEnable: false,
@@ -203,5 +174,21 @@ class _MainScreenState extends State<MainScreen> {
     String value = searchValue.data["documents"][0]["place_url"];
 
     return value;
+  }
+
+  Future<void> getUrlLink(double lat, double lon, String name) async {
+    setState(() {
+      if(mounted) _urlLinkFuture = getLocationInformation(lat, lon, name);
+    });
+
+    try {
+      _urlLink = await _urlLinkFuture!;
+      setState(() {});
+      print("Updated _urlLink value: $_urlLink");
+    } catch (e) {
+      print("Error fetching URL: $e");
+    }
+
+    markerZoom(lat, lon);
   }
 }
