@@ -84,6 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
       clientId: NAVER_MAP_KEY,
       onAuthFailed: (ex) => log("인증 오류 ${ex.message}"),
     );
+    print("네이버 지도 준비 완료");
   }
 
   void storageData(BuildContext context, int index) async {

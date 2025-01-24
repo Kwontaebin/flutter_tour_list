@@ -8,7 +8,6 @@ import 'package:flutter_tour_list/common/function/sizeFn.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_tour_list/mainScreen/view/locationInformation.dart';
 import 'package:provider/provider.dart';
-import '../../common/component/webview.dart';
 import '../../common/const/data.dart';
 import '../../searchScreen/view/search.dart';
 
@@ -78,8 +77,7 @@ class _MainScreenState extends State<MainScreen> {
                 _mapController = controller;
                 mapControllerCompleter.complete(controller);
 
-                print("네이버 지도 준비 완료!!!");
-
+                log("onMapReady", name: "onMapReady");
                 print(dataList);
 
                 for (int i = 0; i < dataList.length; i++) {
