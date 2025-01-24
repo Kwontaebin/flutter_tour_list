@@ -28,21 +28,26 @@ Future<void> showInputDialog(
           TextButton(
             onPressed: () async {
               if (text.isNotEmpty) {
-                final NaverGeocodingService geocodingService = NaverGeocodingService();
+                try {
+                  final NaverGeocodingService geocodingService = NaverGeocodingService();
 
-                final geocodeData = await geocodingService.fetchCoordinates(text);
+                  final geocodeData = await geocodingService.fetchCoordinates(text);
 
-                Map<String, double> dataList = {
-                  "latitude": geocodeData["latitude"],
-                  "longitude": geocodeData["longitude"],
-                };
+                  Map<String, double> dataList = {
+                    "latitude": geocodeData["latitude"],
+                    "longitude": geocodeData["longitude"],
+                  };
 
-                print(text);
-                print(geocodeData["latitude"]);
+                  print(text);
+                  print(geocodeData["latitude"]);
 
-                onCoordinatesUpdated(dataList);
+                  onCoordinatesUpdated(dataList);
 
-                Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                } catch(e) {
+                  print("error log $e");
+                  customToast(message: "일치하는 검색 결과를 찾지 못했습니다. 다시 한번 확인해 주세요");
+                }
               } else {
                 customToast(message: "검색어를 입력하세요");
               }
