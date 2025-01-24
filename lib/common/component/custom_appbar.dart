@@ -35,15 +35,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       centerTitle: true,
       leading: showLeading
-          ? IconButton(
-              onPressed: () async {
-                context.read<DataProvider>().clearDataList();
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back_outlined,
-                color: Colors.black,
-              ))
+          ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                  onPressed: () async {
+                    context.read<DataProvider>().clearDataList();
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back_outlined,
+                    color: Colors.black,
+                  )),
+            )
           : const SizedBox.shrink(),
       actions: actions,
     );

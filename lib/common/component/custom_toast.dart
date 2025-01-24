@@ -3,7 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 void customToast({
   required String message,
-  Color bgColor = Colors.blue,
+  Color bgColor = Colors.black,
   Color textColor = Colors.white,
   double textSize = 16.0,
 }) {

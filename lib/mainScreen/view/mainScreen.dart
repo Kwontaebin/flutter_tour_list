@@ -10,6 +10,7 @@ import 'package:flutter_tour_list/mainScreen/view/locationInformation.dart';
 import 'package:provider/provider.dart';
 import '../../common/const/data.dart';
 import '../../searchScreen/view/search.dart';
+import '../component/showDialog.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -25,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   int _clickedMarkerId = 0;
   String _urlLink = "";
   Future<String>? _urlLinkFuture;
+  String searchText = "";
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +41,9 @@ class _MainScreenState extends State<MainScreen> {
         showLeading: true,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () => showInputDialog(context, text: searchText),
               icon: const Icon(
                 Icons.search,
                 color: Colors.black,
