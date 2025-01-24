@@ -48,7 +48,10 @@ class _MainScreenState extends State<MainScreen> {
                   context,
                   onCoordinatesUpdated: (receivedCoordinates) {
                     setState(() {
-                      _setBound(NLatLng(receivedCoordinates!["latitude"]!, receivedCoordinates!["longitude"]!));
+                      _setBound(
+                        NLatLng(receivedCoordinates!["latitude"]!, receivedCoordinates!["longitude"]!),
+                        offset: 0.05,
+                      );
                     });
 
                     print("Coordinates updated: $receivedCoordinates");
@@ -152,8 +155,8 @@ class _MainScreenState extends State<MainScreen> {
     _mapController?.updateCamera(newCamera);
   }
 
-  void _setBound(NLatLng position) {
-    const double offset = 0.005;
+  void _setBound(NLatLng position, {double offset = 0.005}) {
+    // const double offset = 0.005;
 
     NLatLngBounds bounds = NLatLngBounds(
       southWest: NLatLng(position.latitude - offset, position.longitude - offset),

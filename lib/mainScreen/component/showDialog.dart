@@ -17,6 +17,7 @@ Future<void> showInputDialog(
           hintText: "검색어를 입력하세요",
           onChanged: (value) => text = value,
           textSpacing: true,
+          autoFocus: true,
         ),
         actions: [
           TextButton(
