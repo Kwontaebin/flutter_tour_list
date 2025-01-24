@@ -156,8 +156,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _setBound(NLatLng position, {double offset = 0.005}) {
-    // const double offset = 0.005;
-
     NLatLngBounds bounds = NLatLngBounds(
       southWest: NLatLng(position.latitude - offset, position.longitude - offset),
       northEast: NLatLng(position.latitude + offset, position.longitude + offset),
