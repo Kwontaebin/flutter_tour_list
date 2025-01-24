@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tour_list/common/component/custom_elevatedButton.dart';
 import 'package:flutter_tour_list/common/component/custom_text_field.dart';
-import 'package:flutter_tour_list/common/component/custom_toast.dart';
-import 'package:flutter_tour_list/common/function/sizeFn.dart';
+import '../../common/component/custom_toast.dart';
+import '../../searchScreen/component/geoCoding.dart';
 
-void showInputDialog(
+Future<void> showInputDialog(
   BuildContext context, {
-  required String text,
-}) {
+  required Function(Map<String, double>) onCoordinatesUpdated,
+}) async {
+  String text = "";
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -16,30 +16,9 @@ void showInputDialog(
         content: CustomTextFieldWidget(
           hintText: "검색어를 입력하세요",
           onChanged: (value) => text = value,
+          textSpacing: true,
         ),
         actions: [
-          // customElevatedButton(
-          //   context,
-          //   text: "취소",
-          //   width: sizeFn(context).width * 0.04,
-          //   height: sizeFn(context).height * 0.045,
-          //   buttonTextSize: sizeFn(context).width * 0.04,
-          //   onPressed: () {
-          //     Navigator.of(context).pop();
-          //   },
-          // ),
-          // customElevatedButton(
-          //   context,
-          //   text: "확인",
-          //   width: sizeFn(context).width * 0.04,
-          //   height: sizeFn(context).height * 0.045,
-          //   buttonTextSize: sizeFn(context).width * 0.04,
-          //   onPressed: () {
-          //     print(text);
-          //     Navigator.of(context).pop();
-          //   },
-          // )
-
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(); // 닫기
@@ -47,10 +26,26 @@ void showInputDialog(
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              print(text);
+            onPressed: () async {
+              if (text.isNotEmpty) {
+                final NaverGeocodingService geocodingService = NaverGeocodingService();
 
-              text.isEmpty ? customToast(message: "검색어를 입력하세요") : Navigator.of(context).pop();
+                final geocodeData = await geocodingService.fetchCoordinates(text);
+
+                Map<String, double> dataList = {
+                  "latitude": geocodeData["latitude"],
+                  "longitude": geocodeData["longitude"],
+                };
+
+                print(text);
+                print(geocodeData["latitude"]);
+
+                onCoordinatesUpdated(dataList);
+
+                Navigator.of(context).pop();
+              } else {
+                customToast(message: "검색어를 입력하세요");
+              }
             },
             child: const Text('OK'),
           ),

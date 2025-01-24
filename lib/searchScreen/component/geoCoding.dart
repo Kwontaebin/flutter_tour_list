@@ -3,8 +3,6 @@ import '../../common/const/data.dart';
 
 class NaverGeocodingService {
   final Dio _dio = Dio();
-  final String clientId = NAVER_MAP_KEY; // 네이버 클라이언트 ID
-  final String clientSecret = NAVER_MAP_SECRET_KEY; // 네이버 클라이언트 Secret
 
   Future<Map<String, dynamic>> fetchCoordinates(String address) async {
     try {
@@ -13,8 +11,8 @@ class NaverGeocodingService {
         queryParameters: {'query': address},
         options: Options(
           headers: {
-            'X-NCP-APIGW-API-KEY-ID': clientId,
-            'X-NCP-APIGW-API-KEY': clientSecret,
+            'X-NCP-APIGW-API-KEY-ID': NAVER_MAP_KEY, // 네이버 클라이언트 ID
+            'X-NCP-APIGW-API-KEY': NAVER_MAP_SECRET_KEY, // 네이버 클라이언트 Secret
           },
         ),
       );

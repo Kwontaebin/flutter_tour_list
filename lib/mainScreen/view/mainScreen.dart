@@ -43,7 +43,18 @@ class _MainScreenState extends State<MainScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
-              onPressed: () => showInputDialog(context, text: searchText),
+              onPressed: () async {
+                await showInputDialog(
+                  context,
+                  onCoordinatesUpdated: (receivedCoordinates) {
+                    setState(() {
+                      _setBound(NLatLng(receivedCoordinates!["latitude"]!, receivedCoordinates!["longitude"]!));
+                    });
+
+                    print("Coordinates updated: $receivedCoordinates");
+                  },
+                );
+              },
               icon: const Icon(
                 Icons.search,
                 color: Colors.black,
