@@ -24,9 +24,8 @@ class _MainScreenState extends State<MainScreen> {
   NaverMapController? _mapController;
   List<NLatLng> mapList = [];
   int _clickedMarkerId = 0;
-  String _urlLink = "";
+  String _urlLink = "", searchText = "";
   Future<String>? _urlLinkFuture;
-  String searchText = "";
 
   @override
   Widget build(BuildContext context) {

@@ -63,12 +63,11 @@ class _SearchScreenState extends State<SearchScreen> {
     '강동구'
   ];
 
-  Map<String, dynamic> responseData = {}; // 응답을 받는 데이터
-  Map<String, dynamic> requestData = {}; // 요청을 보내는 데이트
+  // responseData : 응답을 받는 데이터, requestData = 요청을 보내는 데이트
+  Map<String, dynamic> responseData = {}, requestData = {};
   final NaverGeocodingService _geocodingService = NaverGeocodingService();
   List dataList = [];
-  String? _latitude;
-  String? _longitude;
+  String? _latitude, _longitude;
   var dio = Dio();
 
   @override
